@@ -1,0 +1,185 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+</head>
+<body>
+
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+
+<div id="linkwarn" class="warning">
+  <ul>
+    <li>To build against NEUT, NuWro, or GENIE, NUISANCE requires a <strong>full installation of the relevant generator</strong>.</li>
+    <li>Please see <a href="/trac/wiki/HowTo">our generator guides</a> on how to set them up, or simply <a href="mailto:nuisance@projects.hepforge.org">email us</a>.</li>
+  </ul>
+</div>
+
+<h1>Getting the code</h1>
+<p> NUISANCE can be downloaded from our git repository at <a href="https://phab.hepforge.org/source/nuisancegit/">hepforge</a> (click to browse). The clone will default to the head development version: </p>
+To clone with ssh: <span class="code">$ git clone ssh://vcs@phab.hepforge.org/source/nuisancegit.git</span><br>
+To clone with https: <span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git</span>
+
+<!--
+<p> We recommend using frozen releases for physics results using the git branch command: </p>
+
+<span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git -b release_name</span>
+
+<p> The latest release is <span class="code">v2r0</span>, for a list of available releases with validations please see <a href="/nuisancereleases.html">here</a>.</p>
+
+<p>Most other branches are development branches which we don't recommended for physics results.</p>
+-->
+
+<hr class="vis">
+
+<h1>External dependencies</h1>
+<p>NUISANCE's only external dependency is <a href="https://root.cern.ch/">ROOT</a>.</p>
+
+<p>For minimisation routines, we require <strong>v5.34/19</strong> and above.</p>
+
+<div class="note">
+  <ul>
+    <li><strong>How to check your ROOT version:</strong><br>
+    <span class="code">$ root-config --version</span></li>
+  </ul>
+</div>
+
+<p><div class="warning">
+  <ul>
+    <li><strong>Using a lower patch than ROOT 5.34/19 forces omission of the minimisation code from the NUISANCE build and only builds comparison routines.</strong><br>
+    This is because ROOT restructured the <span class="code">Math::Minimizer</span> interface in v5.34/19.</li>
+  </ul>
+</div>
+</p>
+
+
+<p>Most dependencies are already met by the <a href="https://root.cern.ch/content/release-53436">recommended installation method</a>, although we explicitly use <strong>Minuit2</strong> for minimisation.</p>
+
+<h3>Turning ON minimisation in NUISANCE</h3>
+<p>The NUISANCE build enables minimization routines <strong>if it can find Minuit2</strong> in your <span class="code">$ root-config --features</span>.</p>
+<p>You can also force it by include a preprocessor define:</p>
+
+<div class="note">
+  <ul>
+    <li><strong>To force NUISANCE to compile WITH minimizer, add</strong><br>
+    <span class="code">$ -DUSE_MINIMIZER=1</span><br>
+    to your cmake build defines.
+    </li>
+    <li>e.g. for GENIE<br>
+    <span class="code">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=1</span>
+  </ul>
+</div>
+
+<h3>Turning OFF minimisation in NUISANCE</h3>
+<p>NUISANCE supports turning off the Minuit2 libraries if you only want to do generator comparisons and no minimisation, or if you're having trouble with your Minuit2 installation.</p>
+
+<p>If cmake can't find Minuit2 it'll default to turning off the code that depends on Minuit2, but <strong>the option can also be forced</strong>. This is done on <strong>compile time</strong> of NUISANCE by a preprocessor define:</p>
+
+<div class="note">
+  <ul>
+    <li><strong>To force NUISANCE to compile WITHOUT minimizer, add</strong><br>
+    <span class="code">$ -DUSE_MINIMIZER=0</span><br>
+    to your cmake build defines. <br></li>
+    <li>e.g. for GENIE<br>
+    <span class="code">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=0</span>
+    </li>
+  </ul>
+</div>
+
+<p>Your ROOT install should now be ready for some NUISANCE! (If not, please <a href="mailto:nuisance@projects.hepforge.org">email us</a>).</p>
+
+<h3>Troubleshooting Minuit2 installation</h3>
+<p>To check if <strong>Minuit2</strong> has been enabled in your ROOT package:</p>
+
+<div class="note">
+  <ul>
+    <li><strong>Check your ROOT environment:</strong><br>
+    <span class="code">$ echo $ROOTSYS<br>
+      $ which root-config</span></li>
+    <li><strong>If not found, source your ROOT environment:</strong><br>
+    <span class="code">$ source /PATH/TO/YOUR/ROOT/bin/thisroot.sh</span></li>
+    <li><strong>Check ROOT features:</strong><br>
+    <span class="code">$ root-config --features | grep 'minuit2'</span></li>
+    <li><strong>If not found, recompile ROOT with Minuit2 on:</strong><br>
+    <span class="code">$ cd $ROOTSYS<br>
+      $ ./configure --enable-minuit2<br>
+      $ make</span></li>
+    <li><strong>or if you compiled with cmake:</strong><br>
+    <span class="code">$ cd $ROOTSYS<br>
+      $ cmake . -Dminuit2:BOOL=ON<br>
+      $ make</span></li>
+  </ul>
+</div>
+
+<hr class="vis">
+
+<h1>Compiling against generators</h1>
+
+<h2>Compiling against GENIE</h2>
+<div class="note">
+  <ul>
+    <li>Get a <a href="http://www.genie-mc.org">GENIE</a> copy (including reweighting engine) and compile it to your liking (or use a preinstalled distributed version, e.g. through UPS)</li>
+    <li><strong>First test your GENIE environment:</strong><br>
+    <span class="code">$ which genie-config<br>
+      $ echo $GENIE<br></span>
+    If these don't return what you expect, you've set up GENIE wrong<br>
+      <li><strong>Get the NUISANCE code:</strong><br>
+      <span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git</span></li>
+      <li><strong>Build NUISANCE:</strong><br>
+      <strong>Note:</strong> for many recent NUISANCE versions we provide a template of this in <span class="code">myenv.sh</span> (which sets up environment variables for the generators) and <span class="code">freshbuild.sh</span> (which sets up the NUISANCE make process through CMake). Please read and edit these to your liking and/or do this:<br>
+      <span class="code">$ cd nuisance<br>
+        $ mkdir build<br>
+        $ cd build<br>
+        $ cmake ../ -DUSE_GENIE=1<br>
+        $ make <br>
+        $ make docs<br>
+        $ make install<br>
+        $ source $(uname)/setup.sh</span></li>
+      <li><strong>Check the NUISANCE environment:</strong><br>
+      <span class="code">$ which nuiscomp</span></li>
+    </ul>
+  </div>
+
+
+  <h2>Generic compiling against other generators</h2>
+
+  <div class="note">
+    <h3>Checking your environment pre-build</h3>
+    <ul>
+      <li><strong>Check generator environment variables, e.g.</strong><br>
+      <span class="code">$ echo $NEUT_ROOT<br>$ echo $NUWRO<br>$ echo $PYTHIA6</span></li>
+
+      <li><strong>Check ROOT environment variables:</strong><br>
+      <span class="code">$ which root-config<br>$ echo $ROOTSYS</span></li>
+
+      <li><strong>Make NUISANCE build directory:</strong><br>
+      <strong>Note:</strong> for many recent NUISANCE versions we provide a template of this in <span class="code">myenv.sh</span> (which sets up environment variables for the generators) and <span class="code">freshbuild.sh</span> (which sets up the NUISANCE make process through CMake). Please read and edit these to your liking and/or do this:<br>
+      <span class="code">$ cd MY_NUISANCE_INSTALL<br>$ mkdir build<br>$ cd build</span></li>
+
+      <li><strong>Set the compiler flags for the generators:</strong><br>
+      <span class="code">$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=1 -DUSE_GiBUU=1 -DUSE_NUANCE=1 ../</span><br><br>
+      <span class="code">-DUSE_GENERATOR</span> tells the compiler to compile against chosen generator, granted environment variables are set. The default is to set generators to 0.<br><br>
+
+      E.g. <span class="code">$ cmake ../ -DUSE_NUWRO=1</span> enables NuWro alone.<br><br>
+
+      Furthermore, NUISANCE can build GiBUU with <span class="code">$-DBUILD_GiBUU=1</span> in cmake command.</li>
+
+      <li><strong>Build NUISANCE:</strong><br>
+      <span class="code">$ make</span> (exeutables and libraries)<br>
+      <span class="code">$ make docs</span> (doxygen documentation)<br>
+      <span class="code">$ make install</span> (install to build location)</li>
+    </ul>
+
+    <p>The build also generates <span class="code">$(uname)/setup.sh</span>. The file contains exports of generator environment variables available at last compilation time. </p>
+    <p>Doing <span class="code">source $(uname)/setup.sh</span> is all you need before running NUISANCE applications.</p>
+
+  </div>
+
+<hr class="vis">
+  <h1>Wrapping up</h1>
+  <p>NUISANCE has now hopefully compiled properly. Now is the time to venture into the exciting land of neutrino scattering physics! Good luck, have fun!</p>
+
+  <p>NUISANCE comes with <a href="/trac/wiki/UsageExamples">usage examples</a>, which we're continously expanding. </p>
+
+  <p><a href="mailto:nuisance@projects.hepforge.org">We welcome any feedback!</a></p>
+
+</body>
+</html>

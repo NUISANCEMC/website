@@ -1,0 +1,117 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+</head>
+<body>
+
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+
+<h1>Comparing generators to data with <code>nuiscomp</code></h1>
+<h2>Overview</h2>
+<p>A broad range of datasets have been implemented into the NUISANCE framework that support direct comparison between different generator Monte Carlo event samples and published data. The full list is updated for every git commit and available <a href="https://nuisance.hepforge.org/nuisancesamples.html">here</a></p>
+
+<p><code>nuiscomp</code> is the simplest executable comparing data to generator predictions. The datasets and generator files are specified by providing different sample IDs and pointing to different files through a "card file".</p>
+
+<p>You can also provide NUISANCE with systematic parameters and a variety of options outlined below to do closure tests, fitting systematics, and making error bands.</p>
+
+<p>For the code-inclined, <code>nuiscomp</code> lives in <code>nuisance/app/nuiscomp.cxx</code> and is driven by <code>nuisance/src/Routines/ComparisonRoutines.cxx</code>. You can view it <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/app/nuiscomp.cxx">here</a>.</p>
+
+<p>This expands on the documentation provided by running <span class="codebox">$ nuiscomp</span>which is equivalent to <code>$ nuiscomp -h</code>.</p> 
+
+<hr>
+<h2>An example <code>nuiscomp</code> run</h2>
+<p>This example compares GENIE events to MiniBooNE data. The example is near identical for a different generator, you just have to <code>Prepare</code> appropriately and replace GENIE in the cardfile with your generator descriptor, e.g. <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code>.</p>
+<div id="linkwarn" class="warning">
+  <strong>Requirements for the example:</strong>
+<ul>
+  <li>Build <a href="https://nuisance.hepforge.org/GettingTheCode.html">NUISANCE with GENIE</a> succesfully.</li>
+  <li><a href="https://nuisance.hepforge.org/tutorials/PrepareGENIE.html">Prepared your GENIE output</a> for NUISANCE use.</li>
+</ul>
+</div>
+
+<p>Make a plain file <span class="code">mbcomp.card</span> and fill it with:
+<div class="codebox2"><code>&#60nuisance&#62
+  &#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"/&#62
+&#60/nuisance&#62 </code> </div><br>
+<span class="code">sample name</span> specifies the measurement to compare to: in this case MiniBooNE CCQE cross-section in 1 dimensional in Q2 for neutrino.<br>
+<span class="code">input</span> specifies the input generator and the path to the prepared file containing the events: in this case GENIE and our file is <span class="code">PATH_TO_PREPARE_GENIE_EVENTS.root</span></p>
+
+<p>You can now run <code>nuiscomp</code> with this card file by doing <span class="codebox2"><code>  $ nuiscomp -c mbcomp.card -o myoutput.root</code></span>
+where <code>-c</code> flags preceeds the card file and <code>-o</code> preceeds the output file <code>nuiscomp</code> will write to.</p>
+<hr>
+
+<h2>Specifying a measurement</h2>
+<p>Changing the measurement is as easy as replacing the <code>sample name</code> field in the card file. The sample names can be found by running the <code>nuissamples</code> script in <code>nuisance/scripts/nuissamples</code>, making sure you have <code>export</code>ed the <code>NUISANCE</code> environment variable to be your NUISANCE directory.</p>
+
+<p>The output strings can the be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960+ cross section measurement in one dimension in Q2 for neutrino.</p>
+
+<p><a href="https://phab.hepforge.org/source/nuisancegit/browse/master/scripts/nuissamples">The script</a> essentially looks at the string comparison fields in <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/FCN/SampleList.cxx"><code>nuisance/src/FCN/SampleList.cxx</code></a> which is run by <code>nuiscomp</code>. Check it out if you're curious.</p>
+
+<h3>Options for a measurement</h3>
+<p>In <code>nuiscomp</code> samples only have one option, which is the uniform scaling factor applied <code>norm="scale"</code>. It is only accepted if <code>type="FREE"</code> is specified, e.g.
+<div class="codebox"><code>&#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root" norm="0.5" type="FREE"/&#62</code></div>
+to set the normalisation to be 0.5</p>
+
+<p>N.B. the normalisation parameter actually normalises the Monte-Carlo to <code>1/norm</code>.</p>
+
+<hr>
+<h2>Specifying a generator</h2>
+<p>To change the generator you first need to have generated events with said generator and linked NUISANCE to the generator. You can find notes on this <a href="https://nuisance.hepforge.org/GettingTheCode.html">here</a>. You also need to have <a href="Preparing_Files.html">prepared</a> generator files for NUISANCE use.</p>
+
+<p>Once you have NUISANCE linked and prepared files you simply change the <code>input</code> field to match your generator (<code>GENIE</code>, <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code> or <code>NUANCE</code>), and new file location. For example <code>input="NUWRO:PATH_TO_PREPARED_NUWRO_FILE.root"</code>.
+
+<hr>
+<h2>Changing systematics via event reweighting in <code>nuiscomp</code></h2>
+<p>NUISANCE can be linked against various systematics packages, such as GENIE ReWeight, T2K ReWeight, NEUT ReWeight, NOvA ReWeight and the MINERvA tunes, amongst others.</p>
+
+<p>Each systematics packages has a selection of parameters (often referred to as "knobs" or "dials"). For GENIE ReWeight in v2.12.10, these are found in <code>${GENIE}/src/ReWeight/GSyst.h</code> in the <code>AsString(GSyst_t syst)</code> function. An example is the charged current quasi-elastic axial mass ("MAQE"), encoded as <code>"MaCCQE"</code> in <code>GSyst.h</code>.</p>
+
+<p>Adding systematics is done by providing an additional line in the card file. Taking the example of <code>"MaCCQE"</code> in GENIE ReWeight, NUISANCE needs to know the <code>parameter name</code>, the <code>nominal</code> value to reweight to (which creates the generator prediction), and the <code>type</code> of parameter, e.g. a <code>genie_parameter</code>, a <code>custom_parameter</code> and so on.</p>
+
+<p>Expanding on <code>mbcomp.card</code> with <code>mbcomp_fit.card</code>:
+<div class="codebox2"><code>&#60nuisance&#62
+  &#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"/&#62
+  &#60parameter name="MaCCQE" nominal="1.0" type="genie_parameter"/&#62
+&#60/nuisance&#62 </code> </div></p>
+
+<p>For <code>nuiscomp</code> we can additionally provide a <code>state</code> for each parameter. The valid <code>state</code> for parameters is just if we're specifying the <code>nominal</code> in terms of 1 sigma, fractional or absolute values. 
+<ul>
+  <li> <code>type="ABS"</code> specifies it as an absolute value and uses the lookup in <code>${NUISANCE}/parameters/dial_conversion.card</code></li>
+  <li><code>type="FRAC"</code> specifies it as a fractional value</li>
+  <li>Not specifying uses the default generator behaviour, often meaning relative the 1 sigma uncertainty (e.g. for GENIE these are found in <code>${GENIE}/src/ReWeight/GSystUncertainity.cxx</code>).</li>
+</ul>
+</p>
+
+<p>N.B. <code>nuismin</code> expands on these options, as seen <a href="nuismin.html">here</a>.</p>
+
+<hr>
+<h2>Providing command line arguments instead of a card file</h2>
+<code>nuiscomp</code> can also read settings directly from the command line, provided the <code>-i</code> option. For example <code>nuiscomp -o output.root -i 'sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"'</code> would acheive the same effect as providing <code>nuiscomp</code> with the <code>mbcomp.card</code> above.
+
+<hr>
+<h1>Running <code>nuiscomp</code></h1>
+
+-c cardfile
+-o output
+-n number of events
+-f strategy: 
+Custom routines:  LowStat (max events from LOWSTATEVENTS in config), 
+                  FixAtLim (set to high and low values of param),
+                  FixAtLimBreak, 
+                  ErrorBands, (uniform or not, controlled by config.xml error_uniform)
+                  DataToys, make trows of the data using covariance if available
+                  Chi2Scan1D, make chi2 scan one parameter at a time, starting at min going to max with step size step around nominal (fCurVals)
+                  Chi2Scan2D, make pairwise chi2 scans
+                  Contours (not supported)
+
+Specific ROOT minimizer routines: 
+                  Migrad, Combined, Fumili, ConjugatePR, BFGS2, GSLSimAn, MCMC, Contour
+
+-d fakedata input
+-i XML commands
+-q config arguments
+e error
+v verbosity
+
+<hr>
+<h1>Looking into <code>nuiscomp</code> output</h1>

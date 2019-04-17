@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <meta name="exporter-version" content="Evernote Mac 6.13 Beta 1 (455549)"/>
+      <meta name="author" content="john.patrick.stowell@gmail.com"/>
+      <meta name="created" content="2017-11-03 12:43:02 +0000"/>
+      <meta name="source" content="desktop.mac"/>
+      <meta name="updated" content="2017-11-04 12:14:27 +0000"/>
+      <link rel="stylesheet" type="text/css" href="/nuisance.css">
+      <title>Getting the code</title>
+   </head>
+   <body>
+    <img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+     <h1>Getting the Code</h1>
+     <div><br/></div>
+     <div><br/></div>
+      <div>There are a number of distribution options for NUISANCE but the most appropriate one depends on your usage.</div>
+      <div>This can be split into two possibilities:</div>
+      <div>
+         <ul>
+            <li><span style="font-weight: bold;">Tuning</span>: Generating comparisons and model tunings to already implemented datasets inside NUISANCE. </li>
+            <li><span style="font-weight: bold;">Development</span>: Adding your own datasets or reweight dials into the framework and recompiling NUISANCE before running.</li>
+         </ul>
+         <div><br/></div>
+         <div>For just “Tuning” cases, for example when working through the NUISANCE tutorials, any download/build method can be used, but if possible distributed binaries (see below) are recommended as these are the easiest to use. </div>
+      </div>
+      <div><br/></div>
+      <div>If planning to use NUISANCE for “Development” purposes then you will need to be able to recompile NUISANCE against generators of your choice. This is possible in every method <span style="font-weight: bold;">EXCEPT</span> the precompiled binaries and the docker client.</div>
+      <div><br/></div>
+      <div>The available options are listed in the following sections</div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">Compiling from Source</span></div>
+      </div>
+      <div>Usage: Tuning / Development</div>
+      <div>Requirements: Numerous requirements depending on the specific build options (see build page for more details).</div>
+      <div><br/></div>
+      <div>To build NUISANCE from source locally, please see the following page: <a href="/nuisanceinstallation.html">Building The Code</a> </div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">CernVM File System Release</span></div>
+      </div>
+      <div>Usage: Tuning</div>
+      <div>Requirements: Linux Machine, CernVM File System</div>
+      <div><br/></div>
+      <div>This is a common way to access a prebuilt NUISANCE instance on HEP machines. For example the Fermilab gpvm’s all have access to this build. The NUISANCE release is located in the minerva cvmfs area. Don’t worry if you can’t usually see this area when looking in CVMFS on your machine, it just isn’t mounted yet. To setup the NUISANCE CVMFS build please see the following page: <a href="/NUISANCECVMFS.html">NUISANCE CVMFS</a> </div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">NUISANCE Virtual Box</span></div>
+      </div>
+      <div>Usage: Tuning / Development</div>
+      <div>Requirements: Virtual Box</div>
+      <div><br/></div>
+      <div>The NUISANCE Virtual Box is a self contained disk image that has everything you need to run NUISANCE with GENIE and NuWro comparisons. This is the recommended way to run NUISANCE for new users on mac or windows who are not familiar with docker. To download and setup the virtual box please see the following page: <a href="/NUISANCEVirtualBox/Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).html">NUISANCE VirtualBox</a> </div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">NUISANCE Docker Developer</span></div>
+      </div>
+      <div>Usage: Tuning / Development</div>
+      <div>Requirements: root access, Virtual Box + Docker</div>
+      <div><br/></div>
+      <div>The NUISANCE Docker Developer image is capable of building NUISANCE on a mac or windows machine by using docker to create a lightweight CentOS7 wrapper shell around your current terminal, avoiding possible build conflicts/requirements that can appear when building locally. This requires a build area to be mounted into the docker image at runtime so that changes to the NUISANCE installation persist after the docker image is closed. This has the advantage that NUISANCE comes precompiled so is ready to use out of the box, but it can also be changed and recompiled if required.</div>
+      <div><br/></div>
+      <div>A description of how to setup and use the NUISANCE Docker Developer image can be found at the following page: <a href="/NUISANCEDockerDeveloper.html">NUISANCE Docker Developer</a></div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">NUISANCE Docker Client</span></div>
+      </div>
+      <div>Usage: Tuning</div>
+      <div>Requirements: root access, Virtual Box + Docker </div>
+      <div><br/></div>
+      <div>The NUISANCE Docker Client is a simpler docker image to the Developer version that already has NUISANCE pre-built inside the image itself. To use it all that is required is that the folder where Monte Carlo inputs and outputs are saved be mounted into the image at runtime. The disadvantage of this method is any changes to NUISANCE do not persist after the docker image is closed so it can only be used for “Tuning” purposes.</div>
+      <div><br/></div>
+      <div>A description of how to setup and use the NUISANCE Docker Client image can be found at the following page: <a href="/NUISANCEDockerClient.html">NUISANCE Docker Client</a></div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">Precompiled Binaries</span></div>
+      </div>
+      <div>Usage: Tuning</div>
+      <div>Requirements: Varies by system, see usage page.</div>
+      <div><br/></div>
+      <div>A small number of binaries have been precompiled into self-contained tar balls that allow NUISANCE to be used out of the box. </div>
+      <div>This is a relatively new option and each build is still being tested. Please direct any issues to <a href="mailto:p.stowell@sheffield.ac.uk">p.stowell@sheffield.ac.uk</a></div>
+      <div>If you experience problems using these binaries that can’t be easily fixed, please try one of the methods above as an alternative.</div>
+      <div><br/></div>
+      <div>Descriptions of their usage can be found at the following page: <a href="/PrecompiledBinaries.html">Precompiled Binaries</a></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+   </body>
+</html>
+

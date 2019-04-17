@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <link rel="stylesheet" type="text/css" href="/nuisance.css">
+      <title>NUISANCE CVMFS</title>
+   </head>
+   <body>
+    <img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+     <h1>NUISANCE CernVM File System</h1>
+     <br>
+     <br>
+     <p>This is a common way to access a prebuilt NUISANCE instance on HEP machines. For example the Fermilab gpvm’s all have access to this build. The NUISANCE release is located in the minerva cvmfs area. Don’t worry if you can’t usually see this area when looking in CVMFS on your machine, it just isn’t mounted yet, and “ls”-ing the full path will mount it for you.<br/><br/></p>
+      <p>The CVMFS build has access to GENIE 2.12.6 and NuWro-v11q-RW a custom NuWro version made by the NUISANCE authors that supports event reweighting. </p>
+      <br/>
+      <p>Running the following commands should setup the NUISANCE build and all its dependencies.</p>
+      <div class="codebox"><code>export NUISCVMFS=/cvmfs/minerva.opensciencegrid.org/minerva/NUISANCE_080117/
+        ls $NUISCVMFS
+        source $NUISCVMFS/external/setupexternal.sh
+        source $NUISCVMFS/nuisance/v2r6/builds/genie2126-nuwrov11qrw/Linux/setupcvmfs.sh
+         source $GENIE/setup.sh
+         source $NUWRO/build/Linux/setup.sh
+         nuiscomp -h</code>
+      </div>
+      <br/>
+      <p>The setup script is available <a href="/files/setupnuisance.sh">here</a> and can be used to easily set up NUISANCE whenever required</p>
+   </body>
+</html>
+
+

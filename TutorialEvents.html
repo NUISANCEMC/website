@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="exporter-version" content="Evernote Mac 6.13 Beta 1 (455549)"/>
+<meta name="author" content="john.patrick.stowell@gmail.com"/>
+<meta name="created" content="2017-11-03 12:02:13 +0000"/>
+<meta name="source" content="desktop.mac"/>
+<meta name="updated" content="2017-11-04 11:46:36 +0000"/>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+<title>Tutorial Events</title>
+</head>
+<body>
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+<h1>Tutorial Events</h1>
+
+<p>The NUISANCE tutorial requires a few different MC events samples to be generated with NuWro and GENIE.</p>
+<p>To save time and avoid having to generate these yourself some pregenerated samples are provided at the link below. Example generation scripts are also included as examples for those who want to learn how to generate their own MC samples.</p>
+<p>Hyperlink: <a href="https://www.dropbox.com/s/7qjlug1sgg3og7d/tutorial_events.tar.gz?dl=0">Here</a></p>
+
+<p>On a command line you can run the following commands to download and extract the necessary files. </p>
+<div class="codebox"><code>wget https://www.dropbox.com/s/7qjlug1sgg3og7d/tutorial_events.tar.gz?dl=0
+    tar -zxvf tutorial_events.tar.gz\?dl\=0
+    cd tutorial_events</code>
+</div>
+
+<p>The samples contained in the tar-ball are "NUISANCE-ready" which means they can be passed directly into NUISANCE as they are, so that the following commands will all run fine. </p>
+<span class="code">nuisflat -i GENIE:gntp.Default.MiniBooNE_fhc_numu.CH2.500000.ghep.root -o genie.Default.MB.flat.root -f GenericFlux</span>
+<br/>
+<span class="code">nuisflat -i GENIE:gntp.DefaultPlusValenciaMEC.MINERvA_fhc_numu.CH.500000.ghep.root -o genie.DefaultPlusValenciaMEC.MINERvA.flat.root -f GenericFlux</span>
+<br/>
+<span class="code">nuisflat -i NUWRO:nuwrogen.LocalFGNievesQEMEC.MINERvA_fhc_numu.CH.500000.nuwroev.root -o nuwro.LocalFG.MINERvA.flat.root -f GenericFlux</span>
+</body>
+</html>

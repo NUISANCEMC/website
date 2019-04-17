@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <meta name="exporter-version" content="Evernote Mac 6.13 Beta 1 (455549)"/>
+      <meta name="author" content="john.patrick.stowell@gmail.com"/>
+      <meta name="created" content="2017-11-03 12:02:13 +0000"/>
+      <meta name="source" content="desktop.mac"/>
+      <meta name="updated" content="2017-11-04 11:46:36 +0000"/>
+            <link rel="stylesheet" type="text/css" href="/nuisance.css">
+      <title>Precompiled Binaries</title>
+   </head>
+   <body>
+     <img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+     <h1>Precompiled Binaries</h1>
+
+     <p>If you don’t want to manually compile NUISANCE you can try to use our pre-built binaries by downloading the relevant one for your machine below. Be advised that these are relatively new and only tested in a small number of cases so usability may vary.</p>
+     <p>If you have issues please direct all questions to <a href="mailto:p.stowell@sheffield.ac.uk">p.stowell@sheffield.ac.uk</a>. Alternatively, if you would like to build NUISANCE yourself, or download our docker/virtual-box images, then please see the other options on our <a href="/GettingTheCode.html">Getting The Code</a> page.</p>
+     <p>Each binary has slightly different contents depending on the build system, but each one comes with a handy setup script which should define the environment variables needed and let you use NUISANCE out of the box.</p>
+      <p>Note that Linux variants use NuWro-v11q-RW which is NuWro variant developed by the NUISANCE authors that supports simple event reweighting.</p>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">CentOS 6</span></div>
+      </div>
+      <div><br/></div>
+      <div>Contents: libxml2, log4cpp, LHAPDF, ROOT, NuWro-v11q-RW, GENIE-2.12.6, NUISANCE-v2r8</div>
+      <div>Requirements: gfortran, gcc</div>
+      <div>Tested on: CentOS 6 (gcc4.4.7+)</div>
+      <div>Hyperlink: <a href="https://www.dropbox.com/s/pfea9t3xja059c7/nuisance-v2r8-gcc4.4.7-centos6.tar.gz?dl=0">Here</a></div>
+      <div>Download and test run commands:</div>
+      <div class="codebox"><code>wget https://www.dropbox.com/s/pfea9t3xja059c7/nuisance-v2r8-gcc4.4.7-centos6.tar.gz?dl=0
+         tar -zxvf nuisance-v2r8-gcc4.4.7-centos6.tar.gz\?dl\=0
+         cd nuisance-v2r8-gcc4.4.7-centos6.tar.gz
+         source setupnuisance.sh
+         nuiscomp -h</code>
+      </div>
+      <div><br/></div>
+
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">CentOS 6</span></div>
+      </div>
+      <div><br/></div>
+      <div>Contents: libxml2, log4cpp, LHAPDF, ROOT, NuWro-v11q-RW, GENIE-2.12.6, NUISANCE-v2r8</div>
+      <div>Requirements: gfortran, gcc</div>
+      <div>Tested on: CentOS 7 (gcc4.8.5+)</div>
+      <div>Hyperlink: <a href="https://www.dropbox.com/s/wn3o2t3651nid7z/nuisance-v2r8-gcc4.8.5-centos7.tar.gz?dl=0">Here</a></div>
+      <div>Download and test run commands:</div>
+      <div class="codebox"><code>wget https://www.dropbox.com/s/wn3o2t3651nid7z/nuisance-v2r8-gcc4.8.5-centos7.tar.gz?dl=0
+         tar -zxvf nuisance-v2r8-gcc4.8.5-centos7.tar.gz\?dl\=0
+         cd nuisance-v2r8-gcc4.8.5-centos7.tar.gz
+         source setupnuisance.sh
+         nuiscomp -h</code>
+      </div>
+
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">SL 6</span></div>
+      </div>
+      <div><br/></div>
+      <div>Contents: libxml2, log4cpp, LHAPDF, ROOT, NuWro-v11q-RW, GENIE-2.12.6, NUISANCE-v2r8</div>
+      <div>Requirements: gfortran, gcc</div>
+      <div>Tested on: Scientific Linux 6 (gcc4.4.7+)</div>
+      <div>Hyperlink: <a href="https://www.dropbox.com/s/lc6ixiqcy0psdf8/nuisance-v2r8-gcc4.4.7-sl6.tar.gz?dl=0">Here</a></div>
+      <div>Download and test run commands:</div>
+      <div class="codebox"><code>wget https://www.dropbox.com/s/lc6ixiqcy0psdf8/nuisance-v2r8-gcc4.4.7-sl6.tar.gz?dl=0
+         tar -zxvf nuisance-v2r8-gcc4.4.7-sl6\?dl\=0
+         cd nuisance-v2r8-gcc4.4.7-sl6
+         source setupnuisance.sh
+         nuiscomp -h</code>
+      </div>
+
+      <div><br/></div>
+
+
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">Ubuntu 16.04/17.04</span></div>
+      </div>
+      <div><br/></div>
+      <div>Contents: libxml2, log4cpp, LHAPDF, ROOT, NuWro-v11q-RW, GENIE-2.12.6, NUISANCE-v2r8</div>
+      <div>Requirements: gfortran, gcc</div>
+      <div>Tested on: Ubuntu 16.04 (gcc4.9.3+), Ubuntu 17.04 (gcc4.8.5+)</div>
+      <div>Hyperlink: <a href=https://www.dropbox.com/s/lsamibvzwfz5l4e/nuisance-v2r8-gcc4.7.4-ubuntu16.tar.gz?dl=0">Here</a></div>
+      <div>Download and test run commands:</div>
+      <div class="codebox"><code>wget https://www.dropbox.com/s/lsamibvzwfz5l4e/nuisance-v2r8-gcc4.7.4-ubuntu16.tar.gz?dl=0
+         tar -zxvf nuisance-v2r8-gcc4.7.4-ubuntu16.tar.gz\?dl\=0
+         cd nuisance-v2r8-gcc4.7.4-ubuntu16
+         source setupnuisance.sh
+         nuiscomp -h</code>
+      </div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">MacOS 10.12.0</span></div>
+      </div>
+      <div><br/></div>
+      <div>WORK IN PROGRESS</div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><br/></div>
+   </body>
+</html>

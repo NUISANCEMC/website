@@ -1,0 +1,162 @@
+/* The NUISANCE hepforge stylesheet */
+
+/* Clarence also set up so that the wiki gets these stylesheets */
+/* You can change the wiki style sheets by going to /hepforge/nuisance/projconf/trac/templates/site.html */
+/* The py:match bit adds the nuisance.css stylesheet */
+
+
+/* Take away the NB: and WARNING: when using the div class="warning" and "note" */
+div.note:before, div.warning:before, div.important:before {
+  content: "";
+}
+
+div.note, div.note:before, div.warning, div.warning:before {
+  margin: 1px;
+  padding: 1px;
+  border-color: lightgrey;
+  display:block;
+}
+
+/* Change the background color of the note */
+div.note {
+  background-color: #ffd480;
+}
+
+/* Make the news! */
+div.news {
+  background-color: lightgrey;
+  color: black;
+  margin: 0px 0px 0px 0px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+/* Chuck in a NUISANCE news before the NEWS div */
+div.news:before {
+  content: "NUISANCE news:";
+  display: inline-block;
+  font-size: 22px;
+  margin-top: 0em;
+  margin-bottom: 0em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
+
+/* Make the links bold in news, important, note and warning */
+div.news a, div.important a, div.note a, div.warning a {
+  font-weight:bold;
+}
+
+/* Make the code span */
+code {
+  color: rgb(0,0,0);
+  background-color: rgb(240,240,240);
+  font-family: monospace;
+  border:1px solid rgba(0,0,0,0.15);
+}
+
+/* Make the code span */
+span.code {
+  color: rgb(0,0,0);
+  background-color: rgb(240,240,240);
+  font-family: monospace;
+  border:1px solid rgba(0,0,0,0.15);
+}
+
+.codebox {
+  /* Below are styles for the codebox (not the code itself) */
+  padding:5px;
+  margin:0px;
+  display:block;
+  white-space:pre;
+  border:1px solid rgba(0,0,0,0.15);
+  background-color:rgb(240,240,240);
+  font-family: monospace;
+  color: rgb(0,0,0);
+}
+
+/* Change the hr */
+hr.vis {
+  height: 2px;
+}
+
+hr {
+  display: block;
+  color: black;
+  height: 2px;
+  border-width: 1px;
+}
+
+/* Change the h1 on the wikis to be clearer divides */
+.wikipage h1 {
+  margin-top: 0.5cm;
+  margin-bottom: 0.5cm;
+  padding: 8px;
+  box-shadow: 1px 1px 5px 1px grey;
+}
+
+.wikipage h2 {
+  border-top: 1px solid lightgrey;
+  border-bottom: 0px;
+  padding: 5px;
+  box-shadow: 1px 1px 5px 1px lightgrey;
+}
+
+/* Add a cusom listing */
+.newslist li:first-line {
+  font-weight:bold;
+  font-size:105%;
+}
+
+/* Make the spacing a little more */
+.newslist li {
+  margin-top:0.5cm;
+}
+
+/* Make the links in the warning (red background) a different color */
+#linkwarn a:link, #linkwarn a:visited {
+  color: blue;
+}
+
+/* Change the links in the wiki pages */
+#wikipage a:link, #wikipage a:visited {
+  font-weight: bold;
+}
+
+/* The sidebar box in hepforge */
+/* Needs to be included in sidebar or similar */
+/* Otherwise gets over-ridden by hepforge-override.css */
+#hepforge-sidebarbox {
+  white-space: nowrap;
+  background: #eec;
+  border: #cca 3px solid;
+  padding: 1px;
+  padding-left: 1.5em;
+  padding-right: 0.5em;
+  margin-left:0em;
+  margin-right:0.5em;
+}
+
+/* Keep the sidebar box the same for wiki and homepage */
+#hepforge-sidebarbox a:link, #hepforge-sidebarbox a:visited {
+  color: #933;
+}
+
+#hepforge-sidebarbox {
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+/* Over-ride the hepforge default header */
+/* Needs to be included in sidebar or similar */
+/* Otherwise gets over-ridden by hepforge-override.css */
+/*
+#hf_header {
+  background-color: white;
+  color:white;
+  border:0px;
+  font-size:0px;
+  padding:0px;
+}
+*/

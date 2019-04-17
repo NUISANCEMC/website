@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <meta name="exporter-version" content="Evernote Mac 6.13 Beta 1 (455549)"/>
+      <meta name="author" content="john.patrick.stowell@gmail.com"/>
+      <meta name="created" content="2017-10-16 12:09:29 +0000"/>
+      <meta name="source" content="desktop.mac"/>
+      <meta name="updated" content="2017-11-03 12:26:05 +0000"/>
+      <link rel="stylesheet" type="text/css" href="/nuisance.css">
+      <title>Setting up the NUISANCE Virtual Box</title>
+   </head>
+   <body>
+    <img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+     <h1>Setting up the NUISANCE Virtual Box</h1>
+     <div><br/></div>
+     <div><br/></div>
+
+     <div>The NUISANCE Virtual Box is a self contained disk image that has everything you need to run NUISANCE with GENIE and NuWro comparisons. This is the recommended way to run NUISANCE for new users on mac or windows who are not familiar with docker. </div>
+
+<div><br/></div>
+     <div>The following notes show how to load the virtual disk image when using VirtualBox on a Mac, but the procedure should be the same for all machines. </div>
+<div><br/></div>
+      <div><span style="font-weight: bold;">Pre-requisites</span></div>
+      <div>Using VirtualBox to load the NUISANCE disk image and process MC files will require ~5-8GB of available hard drive space. </div>
+      <div><br/></div>
+      <div><span style="font-weight: bold;">1. Install VirtualBox</span></div>
+      <div>Install the VirtualBox for OS X application by downloading it from the following link: <a href="https://www.virtualbox.org/wiki/Downloads">https://www.virtualbox.org/wiki/Downloads</a></div>
+      <div>Note you will need root permissions to install this.</div>
+      <div><br/></div>
+      <div><span style="font-weight: bold;">2. Download the NUISANCEMC Virtual Disk Image</span></div>
+      <div>The NUISANCEMC virtual disk image can be downloaded from the following <a href="https://www.dropbox.com/s/lki4d8o3q1u87um/NUISANCEMC-nuisance.vdi.tar.gz?dl=0">link</a>. Note it is provided as a compressed tar.gz file which you will need to decompress before continuing. </div>
+      <div><br/></div>
+      <div>It can also be obtained by running the command:</div>
+      <div style="box-sizing: border-box; padding: 8px; font-size: 12px; border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; background-color: rgb(251, 250, 248); border: 1px solid rgba(0, 0, 0, 0.14902);">
+      <span style="background-color: rgb(251, 250, 248); color: rgb(51, 51, 51); font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 12px;"><div>wget https://www.dropbox.com/s/lki4d8o3q1u87um/NUISANCEMC-nuisance.vdi.tar.gz?dl=0</div>
+<div>tar -zxvf NUISANCEMC-nuisance.vdi.tar.gz?dl=0 </div> </span>
+      </div>
+      <div><br/></div>
+      <div><br/></div>
+      <div><span style="font-weight: bold;">2. Open VirtualBox</span></div>
+      <div>Once you have VirtualBox setup in your applications folder open the application you can open it. You should see something similar to the following screen.</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/F429DA23-547B-4A02-BEE7-AF5A8BADAA9B.png"  height="408" width="672"/><br/></div>
+      <div><span style="font-weight: bold;">3. Create the NUISANCE Guest OS</span></div>
+      <div><br/></div>
+      <div>Click New to open a New Guest OS dialog box</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/screenshot_1.png" height="408" width="672"/></div>
+      <div><br/></div>
+      <div>If you are not already in Expert Mode, click the “Expert Mode” button to change it now</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/0B51843F-A65C-4323-B63B-52058F4D3CC7.png" height="408" width="672"/><br/></div>
+      <div><br/></div>
+      <div>Now insert “NUISANCEMC” as the name, set the Type to be “Linux” and the Version to be “Red Had (64-bit)”.</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/33B1F3D5-3F99-4CEF-B76B-5C654233BE56.png" height="408" width="672"/><br/></div>
+      <div>Then change the Hard Disk options to select “Use an existing virtual hard disk file"</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/10FFC231-509C-44FE-8B3F-4F2BF80790E6.png" height="408" width="672"/><br/></div>
+      <div><br/></div>
+      <div>Now click the folder icon next to where it says “Empty” in the Hard Disk section to bring up finder window.</div>
+      <div>We want to select the NUISANCEMC.vdi previously downloaded.</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/7F5886CC-5B4E-47D4-8AFD-998125B543F9.png"  height="408" width="672"/><br/></div>
+      <div>You should now see the NUISANCEMC virtual disk image included in our hard disk section. 100.00 GB tells us the disk image is allowed to expand upto 100.00 GB if necessary. Its starting size will be ~5GB.</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/9C6299B7-6432-457C-8F8D-C9C696A4FCD9.png"  height="408" width="672"/><br/></div>
+      <div><br/></div>
+      <div>With everything setup, now click “Create” which should return you to the starting VirtualBox screen, but now you should see a new virtual box listed.</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/CAB76FBA-0F85-4A44-AB1B-A611C3A11CD3.png"  height="408" width="672"/><br/></div>
+      <div><span style="font-weight: bold;">4. Turn on the Virtual Box</span></div>
+      <div>To power on the Virtual box double click the guest machine in the list on the left of labelled "NUISANCEMC". This should change its status to “Running"</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/27B3800D-10FB-4EA9-AF76-778716E1D0E0.png"  height="408" width="672"/><br/></div>
+      <div>And open a new virtualisation window which acts as the Monitor for the Guest OS. If we leave the machine to boot, we should eventually end up at the login screen below:</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/7D8D44EF-86E8-4ECB-8833-6354B31F44FA.png" height="656" width="854"/><br/></div>
+      <div>The login password for this user is “neutrino”. Once logged in you should see the following GNOME desktop which can be used just like a normal CentOS machine.</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/452DE4B4-2861-4ECE-867C-12539D52565F.png" height="656" width="854"/><br/></div>
+      <div><br/></div>
+      <div>Clicking on the screen captures the mouse inputs and uses them inside the GuestOS. If for any reason you need to release your mouse/keyboard from the GuestOS and return control of your normal operating system, on a Mac you must press the left “cmd” key, on Linux and Windows you press the left “ctrl” key.</div>
+      <div><br/></div>
+      <div>We can open a bash terminal by clicking Applications-&gt;Terminal.</div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/E6664E96-BD2F-4A13-BAAD-256EFF965C92.png" height="656" width="854"/><br/></div>
+      <div>The NUISANCEMC folder contains everything you need to run the standard NUISANCE tutorial and make comparisons with both GENIE-2.12.6 and NuWro-v11-RW.</div>
+      <div><br/></div>
+      <div><img src="Setting%20up%20the%20NUISANCE%20Virtual%20Box%20(Mac).resources/screenshot.png" height="656" width="854"/><br/></div>
+      <div>When you log in the virtual images "~/.bashrc” script automatically loads the NUISANCE+generators environmental variables, so NUISANCE should already be ready to run.</div>
+      <div><br/></div>
+      <div>
+         <hr/>
+         <b>NUISANCE Tutorial Events</b>
+      </div>
+      <div><br/></div>
+      <div>For the purposes of the NUISANCE tutorial, you will need the necessary event files. </div>
+      <div><br/></div>
+      <div>These are located in ~/NUISANCEMC/tutorial_events/</div>
+      <div><br/></div>
+      <div>Extract the tarball with the following commands</div>
+      <div style="box-sizing: border-box; padding: 8px; font-family: Monaco, Menlo, Consolas, 'Courier New', monospace; font-size: 12px; color: rgb(51, 51, 51); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; background-color: rgb(251, 250, 248); border: 1px solid rgba(0, 0, 0, 0.14902);-en-codeblock:true;">
+	<div>cd ~/NUISANCEMC/</div>
+	<div>wget https://www.dropbox.com/s/7qjlug1sgg3og7d/tutorial_events.tar.gz?dl=0</div>
+	<div>tar -zxvf tutorial_events.tar.gz\?dl\=0</div>
+	<div>cd tutorial_events</div>
+      </div>
+      <div><br/></div>
+      <div>Contained in the folder are the event files generated with our custom “gevgen_nuisance” and “nuwro_nuisance” applications. Scripts used to generate these event files are also provided for reference.</div>
+      <div><br/></div>
+      <div><br/></div>
+   </body>
+</html>
+
+
+

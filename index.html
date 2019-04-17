@@ -1,0 +1,193 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#02181f">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+<h1>NUISANCE</h1>
+<p>
+  NUISANCE aims to provide a coherent framework for comparing neutrino generators to external data. 
+  NUISANCE can also tune cross-section parameters to available data.
+</p>
+<p>
+Latest validated release : v2r8
+</p>
+
+<p>
+Authors: Luke Pickering, Patrick Stowell, Callum Wilkinson, Clarence Wret
+</p>
+
+<p>Developer mailing list: <a href="mailto:nuisance@projects.hepforge.org">nuisance@projects.hepforge.org</a></p>
+<p>The NUISANCE Slack chat: <a href="https://nuisance-xsec.slack.com">nuisance-xsec.slack.com</a>. If you want access without a @fnal.gov, please <a href="mailto:nuisance@projects.hepforge.org">email us</a>.
+
+<hr class="vis">
+
+<h2>Installing NUISANCE</h2>
+<p>
+Documentation on the NUISANCE installation procedure is available <a href="GettingTheCode.html">here</a>.
+</p>
+<p>We have over 250 cross-section distributions publicly available for GENIE, NuWro, NEUT and GiBUU. For the full list of distributions, please see <a href="nuisancesamples.html">here</a>.</p>
+
+<hr class="vis">
+<div class="news">
+  <ul class="newslist">
+  <li>
+  Dec 2018:<br/>
+  We're working with T2K and NOvA for the upcoming T2K-NOvA workshop at FNAL in February 2019
+  </li>
+  <li>
+  Oct 2018:<br/>
+  The NOvA-MINERvA cross section workshop at FNAL was great and we're happy to have be working with new people. Let's cross section more!
+  </li>
+  <li>
+  Sep 2018:<br/>
+  We're preparing for the T2K interaction model tuning for 2019+ analyses. We've also weasled our way into developing the DUNE interaction model for the Technical Design Report, fingers crossed!
+  </li>
+  <li>
+  Jul 2018:<br/>
+  We've (hopefully) recovered from the HepForge migration from trac to phabricator. Unfortunately this means our wiki is no longer supported, although the information is still stored <a href="/trac/wiki">here</a>.
+  
+  We're working on setting up the github mirror again and commit messages to Slack. 
+  
+  Additionally, all NUISANCE authors have now finished their PhDs, woho! Onto summer conferences!
+  </li>
+  <li>
+  Jun 2017:<br/>
+    NUISANCE v2r0 is validated and released! Check it out by: <br>
+    <span class="code">$ git clone http://nuisance.hepforge.org/git/nuisance.git -b v2r0</span>
+  </li>
+  <li>
+  May 2017:<br/>
+  We've set up a public <a href="https://github.com/NUISANCEMC/nuisance">Github</a> so external users can contribute to the package
+  </li>
+  <li>
+  Mar 2017:<br/>
+  There is silence during the T2K cross-section inputs tuning...
+  </li>
+  <li>
+  Jan 2017:<br/>
+  The NUISANCE overview paper has been published in <a href="http://iopscience.iop.org/article/10.1088/1748-0221/12/01/P01016">JINST</a>. <br>Thanks everyone for the help and support. Stay tuned for multi-generator tuning papers!
+  We're busy filling the <a href="/trac/wiki">wiki</a> with tutorials and howtos. Check it out in the sidebar!
+  </li>
+  <li>
+  Dec 2016:<br/>
+  The NUISANCE paper is available on <a href="https://arxiv.org/abs/1612.07393">arxiv</a> and has been submitted to JINST<br>
+    NUISANCE v1r0 is validated and released! Check it out by: <br>
+    <span class="code">$ git clone http://nuisance.hepforge.org/git/nuisance.git -b v1r0</span>
+  </li>
+  </ul>
+</div>
+
+
+<hr class="vis">
+
+<h2>NUISANCE Features</h2>
+
+<h3>Multiple Generator Inputs</h3>
+<p>NUISANCE can currently handle inputs from the following generators:
+<ul>
+  <li><strong>GENIE</strong></li>
+  <li><strong>NEUT</strong></li> 
+  <li><strong>NuWro</strong></li>
+  <li><strong>GiBUU (with third party event converter)</strong></li>
+  <li><strong>NUANCE (Shape-only)</strong></li>
+</ul>
+If there is a different generator you would like us to implement please let us know.
+</p>
+
+<h3> Raw Generator Comparisons</h3>
+
+<p> The structure of the NUISANCE core classes promotes consistent comparison of different generators by converting each
+format into a common NUISANCE event format. Tools are included to convert these events into simple 'flat tree' formats
+that can be analysed with ROOT alone. </p>
+
+<p>
+<div class="container">
+<img src="/images/fig2a_inclusive_cc1pitmushape.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left;0px">
+<img src="/images/fig2b_inclusive_cc1pitmuxsec.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left:0px;">
+<center>
+<b>Figure 1:</b>
+Raw Generator comparisons with NUISANCE for the MiniBooNE flux with CC1pi+ final state. <br> (left) Shape comparison. (right) Normalised cross-section comparison. 
+</center>
+</div>
+</p>
+
+
+<h3>Data/MC Comparisons</h3>
+<p> The NUISANCE tool "nuiscomp" can be used to generate comparisons of any of the different generators supported
+and any dataset class already implemented into the framework.
+</p>
+
+<p>
+<div class="container">
+<img src="/images/fig5a_nuisancedatacomp_mbccqe.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left;0px">
+<img src="/images/fig5b_nuisancedatacomp_mincc1pi.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left:0px;">
+<center>
+<b>Figure 2:</b>
+Model comparisons with NUISANCE. <br> (left) MiniBooNE CCQE numu. (right) MINERvA CC1pi numu.
+</center>
+</div>
+</p>
+
+<h3>Automated Parameter Tuning</h3>
+<p> Generator ReWeight dials can be provided to NUISANCE to produce modified cross-section predictions. The "nuismin" application
+interfaces these reweight dials with ROOT's minimizer libraries to support automated model parameter tuning using various possible
+parameter estimation routines. </p>
+
+<p>
+<div class="container">
+<img src="/images/fig6a_anltuning_scan.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left;0px">
+<img src="/images/fig6b_anltuning_enudata.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left:0px;">
+<center>
+<b>Figure 3:</b>
+ANL Automated Tuning of the CCQE Axial Mass Parameter in NEUT. <br> (left) Likelihood Scan. (right) Enu ANL Cross-section Data.
+</center>
+
+</div>
+</p>
+
+
+
+
+<h3>Cross-section Systematic Tools</h3>
+<p> The NUISANCE tool "nuissyst" is provided to support the study of cross-section systematics for neutrino experiments.
+Different routines are implemented to validate reweight parameter responses and generate systematic error bands from
+arbritrary covariance matrices for those parameters.
+</p>
+
+<p>
+<div class="container">
+<img src="/images/fig8a_genie_toythrows.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left;0px">
+<img src="/images/fig8b_genie_toymods.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left:0px;">
+<center>
+<b>Figure 4:</b>
+GENIE MC Toy Throws used to create systematic error bands. <br> 
+(left) Example 1-sigma reweight dial variations. (right) Likelihood distribution for all toy throws.
+</center>
+</div>
+</p>
+
+<p>
+<div class="container">
+<img src="/images/fig9a_argoneut_pmubands.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left;0px">
+<img src="/images/fig9b_argoneut_thetamubands.png" alt="NUISANCE2" overflow="hidden" style="max-width:40%;left;margin-bottom:0px;margin-left:0px;">
+</div>
+<center>
+<b>Figure 5:</b>
+GENIE MC Systematic Error Bands for ArgoNeuT anti-neutrino data. <br> 
+(left) Muon Momentum. (right) Muon Angle.
+</center>
+</p>
+
+
+
+
+</body>
+</html>
