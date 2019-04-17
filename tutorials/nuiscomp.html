@@ -8,7 +8,7 @@
 
 <h1>Comparing generators to data with <code>nuiscomp</code></h1>
 <h2>Overview</h2>
-<p>A broad range of datasets have been implemented into the NUISANCE framework that support direct comparison between different generator Monte Carlo event samples and published data. The full list is updated for every git commit and available <a href="https://nuisance.hepforge.org/nuisancesamples.html">here</a></p>
+<p>A broad range of datasets have been implemented into the NUISANCE framework that support direct comparison between different generator Monte Carlo event samples and published data. The full list is updated for every git commit and available <a href="https://nuisance.hepforge.org/nuisancesamples.html">here</a>.</p>
 
 <p><code>nuiscomp</code> is the simplest executable comparing data to generator predictions. The datasets and generator files are specified by providing different sample IDs and pointing to different files through a "card file".</p>
 
@@ -36,7 +36,7 @@
 <div class="codebox">&#60nuisance&#62
   &#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"/&#62
 &#60/nuisance&#62</div><br>
-<span class="code">sample name</span> specifies the measurement to compare to: in this case MiniBooNE CCQE cross-section in 1 dimensional in Q2 for neutrino.<br>
+<span class="code">sample name</span> specifies the measurement to compare to: in this case MiniBooNE CCQE cross-section in 1 dimensional in Q<sup>2</sup> for neutrino.<br>
 <span class="code">input</span> specifies the input generator and the path to the prepared file containing the events: in this case GENIE and our file is <span class="code">PATH_TO_PREPARE_GENIE_EVENTS.root</span></p>
 
 <p>You can now run <code>nuiscomp</code> with this card file by doing
@@ -47,7 +47,7 @@ where <code>-c</code> flags preceeds the card file and <code>-o</code> preceeds 
 <h2>Specifying a measurement</h2>
 <p>Changing the measurement is as easy as replacing the <code>sample name</code> field in the card file. The sample names can be found by running the <code>nuissamples</code> script in <code>nuisance/scripts/nuissamples</code>, making sure you have <code>export</code>ed the <code>NUISANCE</code> environment variable to be your NUISANCE directory.</p>
 
-<p>The output strings can the be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960+ cross section measurement in one dimension in Q2 for neutrino.</p>
+<p>The output strings can the be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960<sup>+</sup> cross section measurement in one dimension in Q<sup>2</sup> for neutrino.</p>
 
 <p><a href="https://phab.hepforge.org/source/nuisancegit/browse/master/scripts/nuissamples">The script</a> essentially looks at the string comparison fields in <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/FCN/SampleList.cxx"><code>nuisance/src/FCN/SampleList.cxx</code></a> which is run by <code>nuiscomp</code>. Check it out if you're curious.</p>
 
@@ -96,7 +96,7 @@ to set the normalisation to be 0.5</p>
 </ul>
 The <code>fakeparameter</code> must be a reweighting parameter <u>already present in the card file</u>, and follows the exact structure, specifying the <code>name</code> and <code>nominal</code>. The <code>nominal</code> is the value with which the fakedata is generated. The fake-data becomes the data histogram in NUISANCE, which is used to calculate e.g. the goodness of fit.</p>
 
-<p>A card file for MiniBooNE CCQE in 1D Q2 for neutrino, setting the fake-data to be GENIE with MaCCQE set to 1 sigma above the default, would be
+<p>A card file for MiniBooNE CCQE in 1D Q<sup>2</sup> for neutrino, setting the fake-data to be GENIE with MaCCQE set to 1 sigma above the default, would be
 <div class="codebox">&#60nuisance&#62
   &#60 sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root" /&#62
   &#60 parameter name="MaCCQE" nominal="1.0" type="genie_parameter" /&#62
