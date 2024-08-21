@@ -14,9 +14,19 @@
 </div>
 
 <h1>Getting the code</h1>
-<p> NUISANCE can be downloaded from our git repository at <a href="https://phab.hepforge.org/source/nuisancegit/">hepforge</a> (click to browse). The clone will default to the head development version: </p>
-To clone with ssh: <span class="code">$ git clone ssh://vcs@phab.hepforge.org/source/nuisancegit.git</span><br>
-To clone with https: <span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git</span>
+<p> NUISANCE can be downloaded from our git repository at <a href=https://github.com/NUISANCEMC/nuisance/>github</a>.
+<!--
+<a href="https://phab.hepforge.org/source/nuisancegit/">hepforge</a> (click to browse). 
+-->
+The clone will default to the head development version: </p>
+<p>To clone with ssh:<br/>
+<span class="codebox">$ git clone git@github.com:NUISANCEMC/nuisance.git</span></p>
+<p>To clone with https:<br/>
+<span class="codebox">$ git clone https://github.com/NUISANCEMC/nuisance.git</span></p>
+<!--
+<span class="code">$ git clone ssh://vcs@phab.hepforge.org/source/nuisancegit.git</span></p>
+<span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git</span></p>
+-->
 
 <!--
 <p> We recommend using frozen releases for physics results using the git branch command: </p>
@@ -38,7 +48,7 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
 <div class="note">
   <ul>
     <li><strong>How to check your ROOT version:</strong><br>
-    <span class="code">$ root-config --version</span></li>
+    <span class="codebox">$ root-config --version</span></li>
   </ul>
 </div>
 
@@ -60,11 +70,11 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
 <div class="note">
   <ul>
     <li><strong>To force NUISANCE to compile WITH minimizer, add</strong><br>
-    <span class="code">$ -DUSE_MINIMIZER=1</span><br>
+    <span class="codebox">$ -DUSE_MINIMIZER=1</span><br>
     to your cmake build defines.
     </li>
     <li>e.g. for GENIE<br>
-    <span class="code">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=1</span>
+    <span class="codebox">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=1</span>
   </ul>
 </div>
 
@@ -76,10 +86,10 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
 <div class="note">
   <ul>
     <li><strong>To force NUISANCE to compile WITHOUT minimizer, add</strong><br>
-    <span class="code">$ -DUSE_MINIMIZER=0</span><br>
+    <span class="codebox">$ -DUSE_MINIMIZER=0</span><br>
     to your cmake build defines. <br></li>
     <li>e.g. for GENIE<br>
-    <span class="code">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=0</span>
+    <span class="codebox">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=0</span>
     </li>
   </ul>
 </div>
@@ -92,20 +102,20 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
 <div class="note">
   <ul>
     <li><strong>Check your ROOT environment:</strong><br>
-    <span class="code">$ echo $ROOTSYS<br>
-      $ which root-config</span></li>
+    <span class="codebox">$ echo $ROOTSYS
+$ which root-config</span></li>
     <li><strong>If not found, source your ROOT environment:</strong><br>
-    <span class="code">$ source /PATH/TO/YOUR/ROOT/bin/thisroot.sh</span></li>
+    <span class="codebox">$ source /PATH/TO/YOUR/ROOT/bin/thisroot.sh</span></li>
     <li><strong>Check ROOT features:</strong><br>
-    <span class="code">$ root-config --features | grep 'minuit2'</span></li>
+    <span class="codebox">$ root-config --features | grep 'minuit2'</span></li>
     <li><strong>If not found, recompile ROOT with Minuit2 on:</strong><br>
-    <span class="code">$ cd $ROOTSYS<br>
-      $ ./configure --enable-minuit2<br>
-      $ make</span></li>
+    <span class="codebox">$ cd $ROOTSYS
+$ ./configure --enable-minuit2
+$ make</span></li>
     <li><strong>or if you compiled with cmake:</strong><br>
-    <span class="code">$ cd $ROOTSYS<br>
-      $ cmake . -Dminuit2:BOOL=ON<br>
-      $ make</span></li>
+    <span class="codebox">$ cd $ROOTSYS
+$ cmake . -Dminuit2:BOOL=ON
+$ make</span></li>
   </ul>
 </div>
 
@@ -118,23 +128,27 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
   <ul>
     <li>Get a <a href="http://www.genie-mc.org">GENIE</a> copy (including reweighting engine) and compile it to your liking (or use a preinstalled distributed version, e.g. through UPS)</li>
     <li><strong>First test your GENIE environment:</strong><br>
-    <span class="code">$ which genie-config<br>
-      $ echo $GENIE<br></span>
+    <span class="codebox">$ which genie-config
+$ echo $GENIE<br></span>
     If these don't return what you expect, you've set up GENIE wrong<br>
       <li><strong>Get the NUISANCE code:</strong><br>
-      <span class="code">$ git clone https://phab.hepforge.org/source/nuisancegit.git</span></li>
+      <p>
+      with git:
+      <span class="codebox">$ git clone git@github.com:NUISANCEMC/nuisance.git</span>
+      or with https:
+      <span class="codebox">$ git clone https://github.com/NUISANCEMC/nuisance.git</span></p>
       <li><strong>Build NUISANCE:</strong><br>
       <strong>Note:</strong> for many recent NUISANCE versions we provide a template of this in <span class="code">myenv.sh</span> (which sets up environment variables for the generators) and <span class="code">freshbuild.sh</span> (which sets up the NUISANCE make process through CMake). Please read and edit these to your liking and/or do this:<br>
-      <span class="code">$ cd nuisance<br>
-        $ mkdir build<br>
-        $ cd build<br>
-        $ cmake ../ -DUSE_GENIE=1<br>
-        $ make <br>
-        $ make docs<br>
-        $ make install<br>
-        $ source $(uname)/setup.sh</span></li>
+      <span class="codebox">$ cd nuisance
+$ mkdir build
+$ cd build
+$ cmake ../ -DUSE_GENIE=1
+$ make
+$ make docs
+$ make install
+$ source $(uname)/setup.sh</span></li>
       <li><strong>Check the NUISANCE environment:</strong><br>
-      <span class="code">$ which nuiscomp</span></li>
+      <span class="codebox">$ which nuiscomp</span></li>
     </ul>
   </div>
 
@@ -145,17 +159,22 @@ To clone with https: <span class="code">$ git clone https://phab.hepforge.org/so
     <h3>Checking your environment pre-build</h3>
     <ul>
       <li><strong>Check generator environment variables, e.g.</strong><br>
-      <span class="code">$ echo $NEUT_ROOT<br>$ echo $NUWRO<br>$ echo $PYTHIA6</span></li>
+      <span class="codebox">$ echo $NEUT_ROOT
+$ echo $NUWRO
+$ echo $PYTHIA6</span></li>
 
       <li><strong>Check ROOT environment variables:</strong><br>
-      <span class="code">$ which root-config<br>$ echo $ROOTSYS</span></li>
+      <span class="codebox">$ which root-config
+$ echo $ROOTSYS</span></li>
 
       <li><strong>Make NUISANCE build directory:</strong><br>
       <strong>Note:</strong> for many recent NUISANCE versions we provide a template of this in <span class="code">myenv.sh</span> (which sets up environment variables for the generators) and <span class="code">freshbuild.sh</span> (which sets up the NUISANCE make process through CMake). Please read and edit these to your liking and/or do this:<br>
-      <span class="code">$ cd MY_NUISANCE_INSTALL<br>$ mkdir build<br>$ cd build</span></li>
+      <span class="codebox">$ cd MY_NUISANCE_INSTALL
+$ mkdir build
+$ cd build</span></li>
 
       <li><strong>Set the compiler flags for the generators:</strong><br>
-      <span class="code">$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=1 -DUSE_GiBUU=1 -DUSE_NUANCE=1 ../</span><br><br>
+      <span class="codebox">$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=1 -DUSE_GiBUU=1 -DUSE_NUANCE=1 ../</span>
       <span class="code">-DUSE_GENERATOR</span> tells the compiler to compile against chosen generator, granted environment variables are set. The default is to set generators to 0.<br><br>
 
       E.g. <span class="code">$ cmake ../ -DUSE_NUWRO=1</span> enables NuWro alone.<br><br>
