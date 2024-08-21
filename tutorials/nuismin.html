@@ -8,9 +8,9 @@
 
 <h1>Fitting generators to data with <code>nuismin</code></h1>
 <h2>Overview</h2>
-<p><code>nuismin</code> expands on <code>nuiscomp</code> (documented <a href="nuiscomp.html">here</a>) by introducing the ability to minimise the test-statistic (i.e. the &#120594<sup>2</sup>) by varying generator parameters (e.g. the axial mass for CCQE interactions, M<sub>A</sub><sup>QE</sup>) and aspects of the data (e.g. normalisations). We recommend reading that documentation and trying comparisons with <code>nuiscomp</code> before running full-blown fits.</p>
+<p><code>nuismin</code> expands on <code>nuiscomp</code> (documented <a href="nuiscomp.html">here</a>) by introducing the ability to minimise the test-statistic (i.e. the &#120594<sup>2</sup>) by varying generator parameters (e.g. the axial mass for CCQE interactions, M<sub>A</sub><sup>QE</sup>) and aspects of the data (e.g. normalisations). <b><u>We recommend reading <a href="nuiscomp.html"><code>nuiscomp</code> documentation</a> and trying comparisons with <code>nuiscomp</code> before running fits with <code>nuismin</code>.</u></b></p>
 
-<p>For the code-inclined, <code>nuismin</code> lives in <code>nuisance/app/nuismin.cxx</code> and is driven by <code>nuisance/src/Routines/ComparisonRoutines.cxx</code>. You can view it <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/app/nuismin.cxx">here</a>.</p>
+<p>For the code-inclined, <code>nuismin</code> lives in <code>nuisance/app/nuismin.cxx</code> and is driven by <code>nuisance/src/Routines/MinimizerRoutines.cxx</code>. You can view it <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/app/nuismin.cxx">here</a>.</p>
 
 <p>This expands on the documentation provided by running 
 <div class="codebox">$ ./nuismin</div></p>
@@ -19,41 +19,55 @@
 
 <hr>
 <h2>An example <code>nuismin</code> run</h2>
-<p>This example compares GENIE events to MiniBooNE data. The example is near identical for a different generator, you just have to <code>Prepare</code> appropriately and replace GENIE in the cardfile with your generator descriptor, e.g. <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code>.</p>
+<p>This example compares GENIE events to MiniBooNE data, just like in <a href="nuiscomp.html#example">nuiscomp</a>, and now fitting for M<sub>A</sub><sup>QE</sup>. Again, the example is near identical for a different generator, you just have to <code>Prepare</code> appropriately and replace GENIE in the cardfile with your generator descriptor, e.g. <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code>. You also need to find the parameter in the generator you want to fit and replace the <code>parameter</code> in the card file appropriately, described below.</p>
 <div id="linkwarn" class="warning">
   <strong>Requirements for the example:</strong>
 <ul>
-  <li>Build <a href="https://nuisance.hepforge.org/GettingTheCode.html">NUISANCE with GENIE</a> succesfully.</li>
+  <li>Build <a href="https://nuisance.hepforge.org/GettingTheCode.html">NUISANCE with GENIE</a> succesfully (with ReWeighting enabled).</li>
   <li><a href="https://nuisance.hepforge.org/tutorials/PrepareGENIE.html">Prepared your GENIE output</a> for NUISANCE use.</li>
 </ul>
 </div>
 
-<p>Make a plain file <span class="code">mbcomp.card</span> and fill it with:
+<p>Make a plain file <span class="code">mbcomp_fit.card</span> and fill it with:
 <div class="codebox">&#60nuisance&#62
   &#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"/&#62
+  &#60parameter name="MaCCQE" nominal="0" type="genie_parameter" state="FREE"/&#62
 &#60/nuisance&#62</div><br>
-<span class="code">sample name</span> specifies the measurement to compare to: in this case MiniBooNE CCQE cross-section in 1 dimensional in Q2 for neutrino.<br>
-<span class="code">input</span> specifies the input generator and the path to the prepared file containing the events: in this case GENIE and our file is <span class="code">PATH_TO_PREPARE_GENIE_EVENTS.root</span></p>
+<span class="code">sample name</span> specifies the measurement to compare to: in this case MiniBooNE CCQE cross-section in 1 dimensional in Q<sup>2</sup> for neutrino.<br>
+<span class="code">input</span> specifies the input generator and the path to the prepared file containing the events: in this case GENIE and our file is <span class="code">PATH_TO_PREPARE_GENIE_EVENTS.root</span><br>
+<span class="code">parameter name</span> specifies the reweighting parameter as a string, where the strings (e.g. <code>MaNCEL</code>, <code>MaCCQE</code>) are the parameter names read in by NUISANCE, see <a href="genie_reweight.html">here</a><br>
+<code>nominal</code> is the parameter value which the minimisation starts at, measured in units of 1 sigma uncertainty, unless specified in <code>state</code><br>
+<code>type</code> is the parameter type, in this case <code>genie_parameter</code> (N.B. for NEUT ReWeight the <code>type</code> is instead <code>neut_parameter</code>)<br>
+<code>state</code> is the state of the parameter which is specifies if the parameters is fixed or free in the fit, and what the units of <code>nominal</code> is. <br>
+<ul>
+  <li>For a free parameter, use <code>state="FREE"</code></li>
+  <li>For a fixed parameter use <code>state="FIX"</code></li>
+</ul>
+See <a href="nuiscomp.html#systematics">here</a> for the <code>nuiscomp</code> documentation on <code>state="ABS"</code> and <code>state="FRAC"</code>.
+</p>
 
 <p>You can now run <code>nuismin</code> with this card file by doing
-<div class="codebox">$ ./nuismin -c mbcomp.card -o myoutput.root</div><br>
-where <code>-c</code> flags preceeds the card file and <code>-o</code> preceeds the output file <code>nuismin</code> will write to.</p>
+<div class="codebox">$ ./nuismin -c mbcomp_fit.card -o myoutput.root</div><br>
+where <code>-c</code> flags preceeds the card file and <code>-o</code> preceeds the output file <code>nuismin</code> will write to. <code>nuismin</code> minimisation takes considerably longer than <code>nuiscomp</code> since it does a large number of reconfigures of the generated events.</p>
+
 <hr>
-
 <h2>Specifying a measurement</h2>
-<p>Changing the measurement is as easy as replacing the <code>sample name</code> field in the card file. The sample names can be found by running the <code>nuissamples</code> script in <code>nuisance/scripts/nuissamples</code>, making sure you have <code>export</code>ed the <code>NUISANCE</code> environment variable to be your NUISANCE directory.</p>
+<p>Follows exactly the same as <a href="nuiscomp.html#measurement">nuiscomp</a>.
 
-<p>The output strings can the be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960+ cross section measurement in one dimension in Q2 for neutrino.</p>
+<h3><a id="options"></a>Options for a measurement</h3>
+<p>In <code>nuiscomp</code> we introduced the option of scaling an experiment using the <code>norm</code> keyword <a href="nuiscomp.html#options">here</a>. In <code>nuismin</code> the sample normalisation can be made a fitting parameter (with or without penalties) using the same syntax, provided <code>type="FREE"</code> is specified.</p>
 
-<p><a href="https://phab.hepforge.org/source/nuisancegit/browse/master/scripts/nuissamples">The script</a> essentially looks at the string comparison fields in <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/FCN/SampleList.cxx"><code>nuisance/src/FCN/SampleList.cxx</code></a> which is run by <code>nuismin</code>. Check it out if you're curious.</p>
+<p>You can also change how the sample is treated statistically, if any corrections or masking should be applied, how it should be scaled, and so on. These can have dramatic effects on the minimisation and are documented <a href="nuiscomp.html#options">here</a>.</p>
 
-<h3>Options for a measurement</h3>
-<p>In <code>nuismin</code> samples only have one option, which is the uniform scaling factor applied <code>norm="scale"</code>. It is only accepted if <code>type="FREE"</code> is specified, e.g.
-<div class="codebox">&#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root" norm="0.5" type="FREE"/&#62</div><br>
-to set the normalisation to be 0.5</p>
+<p>As an example of the impact of using a covariance matrix, we use a card file with
+<div class="codebox"> &#60sample name="MINERvA_CC0pi_XSec_1DQ2QE_nu" input="GENIE:input.root" type="FREE"/&#62
+</div></p>
+<p>MINERvA_CC0pi_XSec_1DQ2QE_nu_norm = 4.89272    +- 0.911015
 
-<p>N.B. the normalisation parameter actually normalises the Monte-Carlo to <code>1/norm</code>.</p>
-
+compared to a card file where we only use the diagonal errors
+<div class="codebox"> &#60sample name="MINERvA_CC0pi_XSec_1DQ2QE_nu" input="GENIE:input.root" type="FREE/DIAG"/&#62
+</div></p>
+  MINERvA_CC0pi_XSec_1DQ2QE_nu_norm = 1.21195    +- 0.0335652
 <hr>
 <h2>Specifying a generator</h2>
 <p>To change the generator you first need to have generated events with said generator and linked NUISANCE to the generator. You can find notes on this <a href="https://nuisance.hepforge.org/GettingTheCode.html">here</a>. You also need to have <a href="Preparing_Files.html">prepared</a> generator files for NUISANCE use.</p>
@@ -61,28 +75,17 @@ to set the normalisation to be 0.5</p>
 <p>Once you have NUISANCE linked and prepared files you simply change the <code>input</code> field to match your generator (<code>GENIE</code>, <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code> or <code>NUANCE</code>), and new file location. For example <code>input="NUWRO:PATH_TO_PREPARED_NUWRO_FILE.root"</code>.
 
 <hr>
-<h2>Changing systematics via event reweighting in <code>nuismin</code></h2>
-<p>NUISANCE can be linked against various systematics packages, such as GENIE ReWeight, T2K ReWeight, NEUT ReWeight, NOvA ReWeight and the MINERvA tunes, amongst others.</p>
+<h2><a id="systematics"></a>Changing systematics via event reweighting in <code>nuismin</code></h2>
+The options for <code>nuismin</code> are again expanded from those in <code>nuiscomp</code>. Please see <a href="nuiscomp.html#systematics">here</a> for the introduction and basic syntax.
 
-<p>Each systematics packages has a selection of parameters (often referred to as "knobs" or "dials"). For GENIE ReWeight in v2.12.10, these are found in <code>${GENIE}/src/ReWeight/GSyst.h</code> in the <code>AsString(GSyst_t syst)</code> function. An example is the charged current quasi-elastic axial mass ("MAQE"), encoded as <code>"MaCCQE"</code> in <code>GSyst.h</code>.</p>
-
-<p>Adding systematics is done by providing an additional line in the card file. Taking the example of <code>"MaCCQE"</code> in GENIE ReWeight, NUISANCE needs to know the <code>parameter name</code>, the <code>nominal</code> value to reweight to (which creates the generator prediction), and the <code>type</code> of parameter, e.g. a <code>genie_parameter</code>, a <code>custom_parameter</code> and so on.</p>
-
-<p>Expanding on <code>mbcomp.card</code> with <code>mbcomp_fit.card</code>:
+<p>Recalling the <code>mbcomp_fit.card</code> from above, we set 
 <div class="codebox">&#60nuisance&#62
   &#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root"/&#62
   &#60parameter name="MaCCQE" nominal="1.0" type="genie_parameter"/&#62
 &#60/nuisance&#62</div></p>
 
-<p>For <code>nuismin</code> we can additionally provide a <code>state</code> for each parameter. The valid <code>state</code> for parameters is just if we're specifying the <code>nominal</code> in terms of 1 sigma, fractional or absolute values. 
-<ul>
-  <li> <code>type="ABS"</code> specifies it as an absolute value and uses the lookup in <code>${NUISANCE}/parameters/dial_conversion.card</code></li>
-  <li><code>type="FRAC"</code> specifies it as a fractional value</li>
-  <li>Not specifying uses the default generator behaviour, often meaning relative the 1 sigma uncertainty (e.g. for GENIE these are found in <code>${GENIE}/src/ReWeight/GSystUncertainity.cxx</code>).</li>
-</ul>
+<p>If no <code>state</code> is given for a systematic it is assumed to be fixed at the <code>nominal</code> value.
 </p>
-
-<p>N.B. <code>nuismin</code> expands on these options, as seen <a href="nuismin.html">here</a>.</p>
 
 <h3>Making fake-data via event reweighting</h3>
 <p>Fake-data can be provided to <code>nuismin</code> in two ways:
@@ -98,7 +101,6 @@ The <code>fakeparameter</code> must be a reweighting parameter <u>already presen
   &#60 parameter name="MaCCQE" nominal="1.0" type="genie_parameter" /&#62
   &#60 fakeparameter name="MaCCQE" nominal="1.0" type="genie_parameter" /&#62
 &#60/nuisance&#62</div></p>
-
 
 <hr>
 <h1>Running <code>nuismin</code></h1>
@@ -123,6 +125,33 @@ The <code>fakeparameter</code> must be a reweighting parameter <u>already presen
     <li><code>"MC"</code>: for setting the data to the nominal MC prediction</li>
     <li><code>"fakedata.root"</code>: Direct path to root file containing a MC histogram called the measurement name with "_MC" at the end (the default format for NUISANCE MC histograms)</li>
   </ul>
+  <li><code>-f string</code>: Fitting routines</li>
+  <ul>
+    <b>Study methods:</b>
+    <li><code>FixAtLim</code>: </li>
+    <li><code>FixAtLimBreak</code>: </li>
+    <li><code>ErrorBands</code>: </li>
+    <li><code>DataToys</code>: </li>
+    <li><code>Chi2Scan1D</code>: </li>
+    <li><code>Chi2Scan2D</code>: </li>
+    <hr>
+    <b>Fitting methods:</b>
+    <li><code>Migrad</code>: (Minuit2, Migrad)</li>
+    <li><code>Simplex</code>: (Minuit2, Simplex)</li>
+    <li><code>Combined</code>: (Minuit2, Combined)</li>
+    <li><code>Brute</code>: (Minuit2, Scan)</li>
+    <li><code>Fumili</code>: (Minuit2, Fumili)</li>
+    <li><code>ConjugateFR</code>: (GSLMultiMin, ConjugateFR)</li>
+    <li><code>ConjugatePR</code>: (GSLMultiMin, ConjugatePR)</li>
+    <li><code>BFGS</code>: (GSLMultiMin, BFGS)</li>
+    <li><code>BFGS2</code>: (GSLMultiMin, BFGS2)</li>
+    <li><code>SteepDesc</code>: (GSLMultiMin, SteepestDescent)</li>
+    <li><code>GSLSimAn</code>: (GSLSimAn)</li>
+    <li><code>MCMC</code></li>
+    <hr>
+    <b>Debugging:</b>
+    <li><code>LowStat</code>: Can be included to routines to run with low statistics (testing or debugging mode), e.g. <code>LowStatMigrad</code> or <code>LowStatChi2Scan1D</code></li>
+  </ul>
   <li><code>-i string</code>: card file-like XML commands (default: empty)</li>
   <li><code>-q string</code>: config arguments, which overwrite <code>nuisance/parameters/config.xml</code> (default: empty)</li>
   <li><code>e +/-</code> error level relative that in <code>nuisance/parameters/config.xml</code></li>
@@ -137,3 +166,36 @@ will read the card file <code>mycard.card</code> and produce the output ROOT fil
 
 <hr>
 <h1>Inspecintg <code>nuismin</code> output</h1>
+
+During minimisation NUISANCE prints the state of the fit to screen, e.g.
+
+<div class="codebox">JointFCN.cxx::ReconfigureFastUsingManager[l. 762] : [ERR WARN  ] : Signal Flags Empty! Using normal manager.
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 495] : Event Manager Reconfigure
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 0 events. [M, W] = [13, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 260000 events. [M, W] = [26, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 520000 events. [M, W] = [26, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 780000 events. [M, W] = [1, 1.11376]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 1040000 events. [M, W] = [46, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 1300000 events. [M, W] = [13, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 1560000 events. [M, W] = [26, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 1820000 events. [M, W] = [26, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 2080000 events. [M, W] = [1, 1.11376]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 574] : MINERvA_CC0pi_XSec_2Dptpz_nu : Processed 2340000 events. [M, W] = [46, 1]
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 700] : Filled 576316 signal events.
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureUsingManager[l. 718] : Time taken ReconfigureUsingManager() : 340
+[LOG Minmzr]:-  : JointFCN.cxx::ReconfigureSamples[l. 430] : Finished Reconfigure iter. 161 in 340s
+[LOG Minmzr]:-  : JointFCN.cxx::GetLikelihood[l. 294] : Getting likelihoods...                      : -2logL
+[LOG Minmzr]:-  : JointFCN.cxx::GetLikelihood[l. 311] : -> MINERvA_CC0pi_XSec_2Dptpz_nu             : 1165.21/144
+[LOG Minmzr]:-  : JointFCN.cxx::GetLikelihood[l. 311] : -> MINERvA_CC0pi_XSec_1DQ2QE_nu             : 182.714/16
+[LOG Fitter]:  : JointFCN.cxx::DoEval[l. 235] : Current Stat (iter. 162) = 1347.92
+[LOG Reconf]:---  : FitWeight.cxx::Print[l. 283] : Fit Weight State: 
+[LOG Reconf]:---  : FitWeight.cxx::Print[l. 285] :  -> Par 0. ZExpA1CCQE -0.209961
+[LOG Reconf]:---  : FitWeight.cxx::Print[l. 285] :  -> Par 1. ZExpA2CCQE -6.90742
+[LOG Reconf]:---  : FitWeight.cxx::Print[l. 285] :  -> Par 2. ZExpA3CCQE 0.518002
+[LOG Reconf]:---  : FitWeight.cxx::Print[l. 285] :  -> Par 3. ZExpA4CCQE -9.99773
+[LOG Reconf]:---  : JointFCN.cxx::ReconfigureSamples[l. 393] : Starting Reconfigure iter. 162
+[LOG Fitter]:  : JointFCN.cxx::ReconfigureFastUsingManager[l. 749] :  -> Doing FAST using manager
+</div>
+
+</body>
+</html>

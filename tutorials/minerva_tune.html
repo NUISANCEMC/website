@@ -1,0 +1,95 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+</head>
+<body>
+
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+
+<h1>Applying the MINERvA tune</h1>
+<p>Contact <a href="mailto:Stephen.Joseph.Dolan@cern.ch">Stephen Dolan</a> or <a href="mailto:c.wret@rochester.edu">Clarence Wret</a> for more info.</p>
+
+<h2>Introduction</h2>
+<p>The "MINERvA tune" (see for example <a href="https://indico.cern.ch/event/703880/contributions/3157437/attachments/1734692/2805233/Xianguo_Lu.pdf">Xianguo's talk at NuInt18</a> or <a href="https://indico.ectstar.eu/event/19/contributions/415/attachments/298/399/MINERvA_2p2h_Tune_at_ECT_Workshop_McFarland.pdf">Kevin's talk at ECT* 2018</a>) starts with the standard GENIE 2.8.4. 
+
+MINERvA then add in Nieves 2p2h events from GENIE 2.12.xx, which will need to be added</p>
+
+<p>The three main ingredients of the MINERvA tune is:
+<ul>
+  <li>A single pion production tune from <a href="https://arxiv.org/abs/1601.01888">Wilkinson et al</a> <code>(arXiv:1601.01888, K. Eur. Phys. J. C (2016) 76: 474)</code>. MINERvA <b>explicitly</b> only uses the non-resonant reduction, and does not change <code>MARes</code> or <code>CCResNorm</code>.</li>
+  <li>A CCQE modification from the combined effects of a Local Fermi Gas (LFG) and the Relativistic Random Phase Approximation (RPA). MINERvA uses Rik Gran's studies (<code>arXiv:1705.02932</code>, <code>FERMILAB-FN-1030-ND</code>) to modify GENIE.</li>
+  <li>A custom Gaussian 2p2h enhancement in q<sub>0</sub> and q<sub>3</sub>, tuned to MINERvA CC-inclusive data in reconstructed space and E<sub>available</sub> and q<sub>3</sub>. See <a href="https://meetings.triumf.ca/indico/event/6/session/4/contribution/77/material/slides/0.pdf">Rik's NuInt 2017 talk</a> and <a href="https://indico.cern.ch/event/703880/contributions/3157437/attachments/1734692/2805233/Xianguo_Lu.pdf">Xianguo's NuInt 2018 talk</a>.</li>
+</ul></p>
+
+<p>NUISANCE has the ability to turn this tune on for any GENIE events, granted it will only be the "true MINERvA tune" when applied to GENIE 2.8.4.</p>
+<p><b>Please note</b> that MINERvA collaborators have reassured us that generating events with GENIE 2.12.xx and then applying the tune is virtually identical to using the "full recipe".</p>
+
+<h2>How to run</h2>
+<p>Stephen broke down the procedure into
+<h4>Event generation</h4>
+<ul>
+  <li>Run GENIE 2.8.4 in default configuration: <b>PLEASE use a uniformly binned flux because early GENIE did not support anything else but does not warn you about it</b>.</li>
+  <li>Run GENIE 2.12.10 for Nieves 2p2h only. To achieve this
+  <ul>
+    <li>Modify the MEC-CC EventGenerator in <code>${GENIE}/config/UserPhysicsOptions.xml</code> to use <code>genie::NievesSimoVacasMECPXSec2016/Default</code> and change the <code>DiNucleonCode</code> accordingly.<br>
+    i.e. have the lines <code>&lt;param type="alg" name="XSecModel@genie::EventGenerator/MEC-CC"&gt; genie::NievesSimoVacasMECPXSec2016/Default &lt;/param&gt;</code> and <code>&lt;param type="bool" name="SetDiNucleonCode"&gt; true &lt;/param&gt; </code> present</li>
+    <li>When running <code>gevgen</code> specify <code>--event-generator-list=CCMEC</code>, which turns on generation for CC MEC only
+  </ul></li>
+</ul>
+
+<h4>NUISANCE with GENIE 2.12.10</h4>
+<ul>
+  <li>Build NUISANCE against your GENIE 2.12.10 with <code>-DUSE_MINERvA_RW=1 -DUSE_GENIE=1</code></li>
+  <li>Run NUISANCE with MINERvA 2p2h tune in attached card on GENIE 2.12.10 output</li>
+</ul>
+
+<h4>NUISANCE with GENIE 2.8.4</h4>
+<ul>
+  <li>Build another NUISANCE against 2.8.4 (where 2.8.4 had been bulit w/ GENIE ReWeight libraries) with <code>-DUSE_MINERvA_RW=1 -DUSE_GENIE=1 -DUSE_REWEIGHT=1</code></li>
+  <li>Run NUISANCE with MINERvA RikRPA (QE) parameters in the card (as you specified) on GENIE 2.8.4 output. This will result in an error asking you to download required files for RikRPA: please follow those instructions</li>
+  <li>Run NUISANCE with MINERvA RikRPA and NonRESBG GENIE parameters in the attached card on GENIE 2.8.4 output</li>
+
+  <li>Have a beer to celebrate a job well done!</li>
+</ul>
+
+<h3>The shorter (and slightly incorrect) version</h3>
+<p>Clarence is a little lazier and usually just runs GENIE 2.12.xx with Nieves 2p2h on, generating with <code>--event-generator-list=Default+CCMEC</code>. 
+
+He then builds one instance of NUISANCE against one instance of GENIE 2.12.xx and applies the tune via the cardfile below.
+
+This is virtually identical to the full method of using GENIE 2.8.4 and GENIE 2.12.10 separately, but involves less steps.</p>
+
+<h2>The card file with the tune</h2>
+<p>The MINERvA tune is applied as a combination of various custom parameters (e.g. <code>GaussianCorr</code>) and GENIE ReWeight parameters. They can be fed to <code>nuisflat</code>, <code>nuiscomp</code> and <code>nuismin</code> as per usual by specifying the card file by <code>-c cardfile.xml</code>.</p>
+
+<p>Please include the follow lines in any standard NUISANCE card file to turn the tune on:
+<div class="codebox">&lt;nuisance&gt;
+  <br/>
+  &lt;!-- Gaussian 2p2h enhancement from MINERvA --&gt;
+  &lt;parameter name="GaussianCorr_2p2h_norm" nominal="10.5798"   type="custom_parameter" state="FIX"/&gt;
+  &lt;parameter name="GaussianCorr_2p2h_tilt" nominal="0.254032"  type="custom_parameter" state="FIX"/&gt;
+  &lt;parameter name="GaussianCorr_2p2h_Pq0"  nominal="0.50834"   type="custom_parameter" state="FIX"/&gt;
+  &lt;parameter name="GaussianCorr_2p2h_Wq0"  nominal="0.0571035" type="custom_parameter" state="FIX"/&gt;
+  &lt;parameter name="GaussianCorr_2p2h_Pq3"  nominal="0.129051"  type="custom_parameter" state="FIX"/&gt;
+  &lt;parameter name="GaussianCorr_2p2h_Wq3"  nominal="0.875287"  type="custom_parameter" state="FIX"/&gt;
+  <br/>
+  &lt;!-- Rik Gran RPA --&gt;
+  &lt;parameter name="MINERvARW_RikRPA_ApplyRPA"     nominal="1.0" type="custom_parameter" state="FIX"/&gt;
+  <br/>
+  &lt;!-- Single pion non-resonant scaling --&gt;
+  &lt;parameter name="NonRESBGvpCC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvnCC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvpNC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvnNC1pi" nominal="-1.14" type="genie_parameter" state="FIX"/&gt;
+  <br/>
+  &lt;!-- Scale by 0.50 with 0.50 uncertainity --&gt;
+  &lt;parameter name="NonRESBGvbarpCC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvbarnCC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvbarpNC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="NonRESBGvbarnNC1pi" nominal="-1.00" type="genie_parameter" state="FIX"/&gt;
+  <br/>
+&lt;/nuisance&gt;
+</div>
+</p>
+</body>
+</html>

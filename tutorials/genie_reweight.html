@@ -1,0 +1,86 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+</head>
+<body>
+
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+
+<h1>Using systematics in NUISANCE</h1>
+<p>NUISANCE can be linked against various systematics packages, such as GENIE ReWeight, T2K ReWeight, NEUT ReWeight, NOvA ReWeight and the MINERvA tunes, amongst others.</p>
+
+<p>Each systematics packages has a selection of parameters (often referred to as "knobs" or "dials"). For GENIE ReWeight in v2.12.10, these are found in <code>${GENIE}/src/ReWeight/GSyst.h</code> in the <code>AsString(GSyst_t syst)</code> function. An example is the charged current quasi-elastic axial mass ("MAQE"), encoded as <code>"MaCCQE"</code> in <code>GSyst.h</code>.</p>
+
+<p>Adding systematics is done by providing an additional line in the card file. Taking the example of <code>"MaCCQE"</code> in GENIE ReWeight, NUISANCE needs to know the <code>parameter name</code>, the <code>nominal</code> value to reweight to (which creates the generator prediction), and the <code>type</code> of parameter, e.g. a <code>genie_parameter</code>, a <code>custom_parameter</code> and so on.</p>
+
+<h1>Using GENIE ReWeight</h1>
+<h2>Finding the parameters</h2>
+<p>For GENIE 2 the full list of reweightable parameters is found in <code>genie/src/ReWeight/GSyst.h</code> in <code>GSyst::AsString(GSyst_t syst)</code>:
+<div class="codebox"> 172 class GSyst {
+ 173 public:
+ 174  //......................................................................................
+ 175  static string AsString(GSyst_t syst)
+ 176  {
+ 177    switch(syst) {
+ 178      case ( kXSecTwkDial_MaNCEL           ) : return "MaNCEL";               break;
+ 179      case ( kXSecTwkDial_EtaNCEL          ) : return "EtaNCEL";              break;
+ 180      case ( kXSecTwkDial_NormCCQE         ) : return "NormCCQE";             break;
+ 181      case ( kXSecTwkDial_NormCCQEenu      ) : return "NormCCQEenu";          break;
+ 182      case ( kXSecTwkDial_MaCCQE           ) : return "MaCCQE";               break;
+</div>
+where the strings (e.g. <code>MaNCEL</code>, <code>MaCCQE</code>) are the parameter names read in by NUISANCE.<br>
+</p>
+
+<h2>Finding the central values</h2>
+
+<h2>Finding the 1 sigma uncertainties</h2>
+
+<h1>Using NEUT ReWeight</h1>
+
+<h2>Finding the parameters</h2>
+<p>NEUT ReWeight closely follows GENIE ReWeight by design. For NEUT the list of reweightable parameters is found in <code>neut/src/reweight/NSyst.h</code>.
+
+In NEUT 5.3.6 we have
+<div class="codebox"> 233 class NSyst {
+ 234 public:
+ 235   //......................................................................................
+ 236   static string AsString(NSyst_t syst)
+ 237   {
+ 238     switch(syst) {
+ 239     case ( kXSecTwkDial_NormNCEL         ) : return "NormNCEL";             break;
+ 240       //case ( kXSecTwkDial_NormNCELenu      ) : return "NormNCELenu";          break;
+ 241     case ( kXSecTwkDial_MaNCEL           ) : return "MaNCEL";               break;
+ 242     case ( kXSecTwkDial_MaNCELshape      ) : return "MaNCELshape";          break;
+ 243     case ( kXSecTwkDial_1overMaNCEL2      ) : return "1overMaNCEL2";          break;
+ 244     case ( kXSecTwkDial_AxlFFNCEL   ) : return "AxlFFNCEL";       break;
+ 245     case ( kXSecTwkDial_VecFFNCEL   ) : return "VecFFNCEL";       break;
+ 246       //case ( kXSecTwkDial_VecFFNCELshape   ) : return "VecFFNCELshape";       break;
+ 247       //case ( kXSecTwkDial_EtaNCEL          ) : return "EtaNCEL";              break;
+ 248 
+ 249     case ( kXSecTwkDial_NormCCQE         ) : return "NormCCQE";             break;
+ 250       //case ( kXSecTwkDial_NormCCQEenu      ) : return "NormCCQEenu";          break;
+ 251     case ( kXSecTwkDial_MaCCQE           ) : return "MaCCQE";               break;
+</code>
+</p>
+
+<h2>Finding the central values</h2>
+
+<h2>Finding the 1 sigma uncertainties</h2>
+
+<h1>Using NuWro ReWeight</h1>
+
+<h1>Using T2KReWeight</h1>
+<h2>Using NIWGReWeight</h2>
+<h2>Using NEUTReWeight via T2KReWeight</h2>
+
+<h1>Using NOvAReWeight</h1>
+
+<h1>Using NUISANCE custom reweight</h1>
+<h2>MINERvA tune</h2>
+<h3>Custom Gaussian enhancements</h3>
+<h3>RikRPA</h3>
+<h3>GENIE ReWeight dials</h3>
+<h2>Oscillation probability calculator</h2>
+
+</body>
+</html>

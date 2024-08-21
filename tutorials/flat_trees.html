@@ -1,0 +1,47 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/nuisance.css">
+</head>
+<body>
+<img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
+
+<h1>Flat trees in NUISANCE</h1>
+<p>NUISANCE has the ability to convert generated events into useful input-agnostic flat-trees. Using this, you can generate events with GENIE, NuWro, NEUT and GiBUU and use the same simple <code>TTree</code> analysis with identical branches for the generators.</p>
+
+<p>We also gave a tutorial on this at the Pittsburgh Tensions workshop in 2019, which you can find <a href="https://nuisance.hepforge.org/files/talks/HowTo_FlatTree.pdf">here</a>.</p>
+
+<p>You can generate your own flat-trees using the <code>nuisflat</code> executable, which takes <code>-i GENERATOR:FILE</code> as input, where <code>GENERATOR</code> is your generator in upper case (e.g. <code>GENIE</code>, <code>NUWRO</code>, <code>NEUT</code>, <code>GIBUU</code>). You provide the output file name by <code>-o outputfile.root</code> where <code>outputfile.root</code> is your output file.</p>
+
+<h2>Output branches in flat tree</h2>
+<p>To print the branches, simply do <code>FlatTree_VARS->Print()</code>.
+
+<p>Most flat-tree branches are straightforwardly named, e.g. <code>Mode</code> follows the interaction mode convention <a href="interaction_modes.html">here</a>. The <code>TTree</code> is named <code>FlatTree_VARS</code>.</p>
+
+<h3>Event characteristics</h3>
+<p>Characterists such as Q2, W, Enu are all available in the trees. </p>
+
+<h3>Particle information</h3>
+<p>Particle information is also available in the <code>E, px, py, pz, pdg</code> branches. These are all final state particles. Depending on how your flat-trees were generated, they may also include vertex and initial state information in the <code>_init</code> branch for initial state particles, and the <code>_vert</code> branch for the vertex (primary, before final state interactions) particles.</p>
+
+<h3>Signal definitions</h3>
+<p>You can use signal definitions to draw events that would only pass certain selections. You can either make your own using the particle information provided in the flat-trees and outlined above, or you can use our pre-calculated ones.</p>
+
+<p>The signal definition flags are all prepended by <code>flag</code>, for instance <code>flagCC0pi</code> is the CC0pi flag (charged current event with 0 pions in the final state). 
+
+<h2>Scaling to a cross-section</h2>
+<p>NUISANCE also provide the <code>fScaleFactor</code> which scales your flat-tree to a cross-section, enabling full comparisons for multiple generators and not just shape only comparisons.</p>
+
+<h2>Weighting the distribution</h2>
+<p>You can also evaluate the effect of systematics on the distributions by including reweighting engines in NUISANCE and load the parameters in a config file. You provide the config file by <code>-c config.xml</code> where <code>config.xml</code> is your config file.</p>
+
+<p>The format of parameters is the usual in NUISANCE which you can find details of in <a href="https://nuisance.hepforge.org/tutorials/nuismin.html">a different tutorial</a>. In a nutshell, you do
+<div class="codebox">&#60nuisance&#62
+  &#60parameter name="MaCCQE" nominal="1.5" type="genie_parameter"/&#62
+&#60/nuisance&#62
+</div></p>
+
+<p>where the <code>nominal</code> field contains the parameter value you want to reweight to. Be careful to consistently use units here! For instance, 1.5 probably does not mean MAQE=1.5 GeV/c2, but instead means a 1.5 sigma variation of MAQE, defined by GENIE's internal uncertainties. Here be dragons, so be careful and ask questions.
+
+<h2>Source code for the curious hacker</h2>
+<p>The code used to make flat-trees is very simple, and just defines variables and methods to get them, as you might expect. All is done in the <code>MCStudies/GenericFlux_Vectors.cpp</code> which you can find <a href="https://github.com/NUISANCEMC/nuisance/blob/master/src/MCStudies/GenericFlux_Vectors.cxx">here</a> on our github. Feel free to add your own variables, and if you think they're extra useful just put in a pull request and we'll review it!
+

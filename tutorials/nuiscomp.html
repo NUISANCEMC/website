@@ -7,6 +7,7 @@
 <img src="/images/nuisancelogo.png" alt="NUISANCE" style="height:200px;float:right;margin-bottom:0px;margin-left:0px;margin-right:0px;">
 
 <h1>Comparing generators to data with <code>nuiscomp</code></h1>
+<p>Written by Clarence on 22 April 2019.</p>
 <h2>Overview</h2>
 <p>A broad range of datasets have been implemented into the NUISANCE framework that support direct comparison between different generator Monte Carlo event samples and published data. The full list is updated for every git commit and available <a href="https://nuisance.hepforge.org/nuisancesamples.html">here</a>.</p>
 
@@ -21,8 +22,9 @@
 <p>which is equivalent to 
 <div class="codebox">$ ./nuiscomp -h</div></p> 
 
+
 <hr>
-<h2>An example <code>nuiscomp</code> run</h2>
+<h2><a id="example"></a>An example <code>nuiscomp</code> run</h2>
 <p>This example compares GENIE events to MiniBooNE data. The example is near identical for a different generator, you just have to <code>Prepare</code> appropriately and replace GENIE in the cardfile with your generator descriptor, e.g. <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code>.</p>
 <div id="linkwarn" class="warning">
   <strong>Requirements for the example:</strong>
@@ -44,19 +46,45 @@
 where <code>-c</code> flags preceeds the card file and <code>-o</code> preceeds the output file <code>nuiscomp</code> will write to.</p>
 <hr>
 
-<h2>Specifying a measurement</h2>
+<h2><a id="measurement"></a>Specifying a measurement</h2>
 <p>Changing the measurement is as easy as replacing the <code>sample name</code> field in the card file. The sample names can be found by running the <code>nuissamples</code> script in <code>nuisance/scripts/nuissamples</code>, making sure you have <code>export</code>ed the <code>NUISANCE</code> environment variable to be your NUISANCE directory.</p>
 
-<p>The output strings can the be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960<sup>+</sup> cross section measurement in one dimension in Q<sup>2</sup> for neutrino.</p>
+<p>The output strings can then be used in the <code>sample name</code> field, e.g. <code>sample name="MiniBooNE_CC1pip_XSec_1DQ2_nu"</code> would specify MiniBooNE's CC1&#960<sup>+</sup> cross section measurement in one dimension in Q<sup>2</sup> for neutrino.</p>
 
 <p><a href="https://phab.hepforge.org/source/nuisancegit/browse/master/scripts/nuissamples">The script</a> essentially looks at the string comparison fields in <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/FCN/SampleList.cxx"><code>nuisance/src/FCN/SampleList.cxx</code></a> which is run by <code>nuiscomp</code>. Check it out if you're curious.</p>
 
-<h3>Options for a measurement</h3>
-<p>In <code>nuiscomp</code> samples only have one option, which is the uniform scaling factor applied <code>norm="scale"</code>. It is only accepted if <code>type="FREE"</code> is specified, e.g.
+<h3><a id="options"></a>Options for a measurement</h3>
+<p>Samples have a normalisation option, which is applied through <code>norm="scale"</code>, where scale is a number. It is only accepted if <code>type="FREE"</code> is specified, e.g.
 <div class="codebox">&#60sample name="MiniBooNE_CCQE_XSec_1DQ2_nu" input="GENIE:PATH_TO_PREPARED_GENIE_EVENTS.root" norm="0.5" type="FREE"/&#62</div><br>
-to set the normalisation to be 0.5</p>
+sets the normalisation of the sample to be 0.5. <b>N.B.</b> the normalisation parameter actually normalises the Monte-Carlo to <code>1/norm</code>.</p>
 
-<p>N.B. the normalisation parameter actually normalises the Monte-Carlo to <code>1/norm</code>.</p>
+<p>The options given to <code>type</code> relate to how the <code>sample</code> is treated, either statistically (e.g. &#120594<sup>2</sup> calculation without a covariance matrix) or normalisation scaling (e.g. doing a shape-only fit). These come in full effect in <code>nuismin</code> which is driven by a test-statistic which isn't the case for the simpler <code>nuiscomp</code>.</p>
+
+<p>Use <code>type="OPTION"</code> with <code>OPTION</code> set to:
+<ul>
+  <li><code>FIX</code>, <code>FREE</code>, <code>SHAPE</code>: Keep the sample normalisation fixed, free, or shape only (normalises the generator prediction to the data)</li>
+  <li><code>FULL</code>, <code>DIAG</code>: Use the full covariance or diagonal covariance matrix to calculate the test-statistic</li>
+  <li><code>NORM</code>: Add a normalisation penalty if one is specified in the sample, controlled by the private member <code>fNormError</code>, set in each sample's constructor. <br>
+  e.g. for MiniBooNE T<sub>&#956</sub>cos&#952<sub>&#956</sub> it is specified that the normalisation error was 10.1%, so is implemented <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/MiniBooNE/MiniBooNE_CCQE_XSec_2DTcos_nu.cxx$41">here</a>.</li>
+</ul>
+where options on different rows can be provided simultaneously, separated by <code>/</code>. For an example of this in <code>nuismin</code>, see <a href="nuismin.html#options">here</a>.</p>
+
+<h3>Sample dependent and debugging options</h3>
+<p>Some lesser used (sample dependent) <code>type</code>s to provide to a sample are:
+<ul>
+  <li><code>Q2CORR</code>: Apply a Q<sup>2</sup>-dependent correction if data supports it (currently just ANL, BNL, BEBC and FNAL bubble chamber CCQE measurements)</li>
+  <li><code>MASK</code>: Use provided masking histogram. This may be useful if you want to use a measurement that should mask out regions you don't want to use, e.g. low Q<sup>2</sup> in a bubble chamber</li>
+</ul></p>
+
+<p>Some even lesser used options are related to how the sample is scaled. <b>These options are always set in the sample implementation file and shouldn't have to be touched by a user for other than debugging purposes</b>. They are:
+<ul>
+  <li><code>ENU1D</code>: Treat the measurement as a total cross-section: that is scale toa bin-by-bin flux integrated cross-section rather than flux integrated over the entire range. </li>
+  <li><code>NOWIDTH</code>: No bin-width scaling is applied (so is e.g. cross-section/bin rather than cross-section/MeV)</li>
+  <li><code>RAW</code>: Measurement is raw events (not a cross-section), so does not scale MC to a differential cross-section. Instead it scales the MC integral to be the data integral for every iteration</li>
+</ul>
+</p>
+
+<p>Additionally, some samples have settings specific to each measurement. These are documented in the implementation. A good example is <code>nuisance/src/ANL/ANL_CC1ppip_XSec_1DEnu_nu.cxx</code> (found <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/ANL/ANL_CC1ppip_XSec_1DEnu_nu.cxx">here</a>), which has many data releases and corrections: W < 1.4 GeV, W < 1.6 GeV, and no W cut. Furthermore the W < 1.4 GeV and no W cut data has the ability to apply a E<sub>&#120642</sub> dependent correction (<a href="https://journals.aps.org/prd/abstract/10.1103/PhysRevD.90.112017">Phys. Rev. D 90, 112017</a> and <a href="https://link.springer.com/article/10.1140%2Fepjc%2Fs10052-016-4314-3">Eur. Phys. J. C (2016) 76: 474. </a>).</p>
 
 <hr>
 <h2>Specifying a generator</h2>
@@ -65,12 +93,8 @@ to set the normalisation to be 0.5</p>
 <p>Once you have NUISANCE linked and prepared files you simply change the <code>input</code> field to match your generator (<code>GENIE</code>, <code>NEUT</code>, <code>NUWRO</code>, <code>GIBUU</code> or <code>NUANCE</code>), and new file location. For example <code>input="NUWRO:PATH_TO_PREPARED_NUWRO_FILE.root"</code>.
 
 <hr>
-<h2>Changing systematics via event reweighting in <code>nuiscomp</code></h2>
-<p>NUISANCE can be linked against various systematics packages, such as GENIE ReWeight, T2K ReWeight, NEUT ReWeight, NOvA ReWeight and the MINERvA tunes, amongst others.</p>
-
-<p>Each systematics packages has a selection of parameters (often referred to as "knobs" or "dials"). For GENIE ReWeight in v2.12.10, these are found in <code>${GENIE}/src/ReWeight/GSyst.h</code> in the <code>AsString(GSyst_t syst)</code> function. An example is the charged current quasi-elastic axial mass ("MAQE"), encoded as <code>"MaCCQE"</code> in <code>GSyst.h</code>.</p>
-
-<p>Adding systematics is done by providing an additional line in the card file. Taking the example of <code>"MaCCQE"</code> in GENIE ReWeight, NUISANCE needs to know the <code>parameter name</code>, the <code>nominal</code> value to reweight to (which creates the generator prediction), and the <code>type</code> of parameter, e.g. a <code>genie_parameter</code>, a <code>custom_parameter</code> and so on.</p>
+<h2><a id="systematics"></a>Changing systematics via event reweighting in <code>nuiscomp</code></h2>
+<p>An overview of the systematics present in NUISANCE is given <a href="genie_reweight.html">here</a>. Here we show how to include systematics in card file for <code>nuiscomp</code>.</p>
 
 <p>Expanding on <code>mbcomp.card</code> with <code>mbcomp_fit.card</code>:
 <div class="codebox">&#60nuisance&#62
@@ -86,7 +110,7 @@ to set the normalisation to be 0.5</p>
 </ul>
 </p>
 
-<p>N.B. <code>nuismin</code> expands on these options, as seen <a href="nuismin.html">here</a>.</p>
+<p>N.B. <code>nuismin</code> expands on these options, as seen <a href="nuismin.html#systematics">here</a>.</p>
 
 <h3>Making fake-data via event reweighting</h3>
 <p>Fake-data can be provided to <code>nuiscomp</code> in two ways:
@@ -137,7 +161,165 @@ The <code>fakeparameter</code> must be a reweighting parameter <u>already presen
 <div class="codebox">$ ./nuiscomp -c mycard.card -o myoutput.root</div><br>
 will read the card file <code>mycard.card</code> and produce the output ROOT file <code>myoutput.root</code>.</p>
 
-<p>NUISANCE produces various output as it sets up, using different verbosity logging levels, defined in <code>nuisance/parameters/config.xml</code>.
+<hr>
+<h1><a id="logs"></a>Inspecting <code>nuiscomp</code> logs</h1>
+<p>NUISANCE produces various output as it sets up, using different verbosity logging levels, defined in <code>nuisance/parameters/config.xml</code>. This section explains what lines indicate what.</p>
+
+<p>In this example the home directory is <code>/home/nuisance</code>, built in <code>/home/nuisance/build</code>. The cardfile is called <code>cardfile.xml</code>, containing
+<div class="codebox">&lt;nuisance&gt;
+  &lt;parameter name="ZExpA1CCQE" nominal="1"   type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="ZExpA2CCQE" nominal="-1"  type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="ZExpA3CCQE" nominal="1"   type="genie_parameter" state="FIX"/&gt;
+  &lt;parameter name="ZExpA4CCQE" nominal="-1"  type="genie_parameter" state="FIX"/&gt;
+  &lt;sample name="MINERvA_CC0pi_XSec_1DQ2QE_nu" input="GENIE:/home/nuisance/GENIE_file.root" type="FREE" norm="0.8/&gt;
+&lt;/nuisance&gt;
+</div><br>
+which loads up the sample <code>MINERvA_CC0pi_XSec_1DQ2QE_nu</code> with a prepared GENIE file in <code>/home/nuisance/GENIE_file.root</code> and a normalisation of 0.8. It specifies four GENIE ReWeight parameters for the z-expansion model: <code>ZExpA1CCQE</code>, <code>ZExpA2CCQE</code>, <code>ZExpA3CCQE</code>, and <code>ZExpA4CCQE</code>.
+</p>
+
+<h2>Printing verbosity</h2>
+<p>The first lines set up the logger with verbosity levels, defined in <code>/home/nuisance/parameters/config.xml</code>. Here we've set it to <code>VERBOSITY=4</code> and <code>ERROR=2</code>.
+<div class="codebox">[ NUISANCE ]: Loading DEFAULT settings from : /home/nuisance/parameters/config.xml -&gt; DONE.
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> : nuiscomp.cxx::main[l. 213] : Starting nuiscomp.exe
+[ NUISANCE ]: Trying to parse file : cardfile.xml -&gt; Found XML file.
+[ NUISANCE ]: Loading XML settings from : cardfile.xml
+ -&gt; DONE.
+[ NUISANCE ]: Finalising run settings[INFO]: Removing node: config
+[INFO]: Removing node: config
+[INFO]: Removing node: config
+[INFO]: Removing node: config
+ -&gt; DONE.
+[ NUISANCE ]: Setting VERBOSITY=4
+[ NUISANCE ]: Setting ERROR=2
+</div>
+</p>
+
+<h2>Reading the cardfile</h2>
+<p>NUISANCE then continues to process the cardfile and register the settings internally. It recognises our four GENIE parameters, their values and types. It then proceeds to find the sample that we specified, it's type, normalisation and file location
+<div class="codebox"><span class="bold"><span class="f2">[LOG Fitter]: </span></span>Setting up nuiscomp
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Number of parameters :  4
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Read genie_parameter : ZExpA1CCQE = 1 : FIX
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Read genie_parameter : ZExpA2CCQE = -1 : FIX
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Read genie_parameter : ZExpA3CCQE = 1 : FIX
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Read genie_parameter : ZExpA4CCQE = -1 : FIX
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Number of samples : 1
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Read Sample 0. : MINERvA_CC0pi_XSec_1DQ2QE_nu (FREE) [Norm=0.8]
+                                -&gt; input='GENIE:/home/nuisance/GENIE_file.root'
+</div>
+</p>
+
+<h2>Loading the ReWeighter</h2>
+<p>The reweighting parameters are specified in the <code>FitWeight</code> class, which interfaces to GENIE and the reweighting. The GENIE parameters are each given a unique enum. The sample normalisation is also registered as a parameter and is given a unique enum.
+<div class="codebox"><span class="bold"><span class="f2">[LOG Fitter]: </span></span>Setting up FitWeight Engine
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registered Dial Enum : ZExpA1CCQE 5 5069
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Adding reweight engine 5
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Setting up GENIE RW : genierw
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Setting GENIE ReWeight CCQE to kModeZExp
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registering ZExpA1CCQE from ZExpA1CCQE
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registered Dial Enum : ZExpA2CCQE 5 5070
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registering ZExpA2CCQE from ZExpA2CCQE
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registered Dial Enum : ZExpA3CCQE 5 5071
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registering ZExpA3CCQE from ZExpA3CCQE
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registered Dial Enum : ZExpA4CCQE 5 5072
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registering ZExpA4CCQE from ZExpA4CCQE
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Registered Dial Enum : MINERvA_CC0pi_XSec_1DQ2QE_nu_norm 9 9000
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Adding reweight engine 9
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Setting up Likelihood Weight RW : normrw
+</div>
+</p>
+
+<h2>Building the samples</h2>
+<p>We then progress to reading the input sample, its file location and loads up the GENIE event handler. We're provided with some information on the input file: the number of entries we're reading, the converted event rate and flux, and finally the Event/Flux which is equivalent to the flux averaged single bin cross-section.</p>
+
+<div class="codebox"><span class="bold"><span class="f2">[LOG Fitter]: </span></span>Building the SampleFCN
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Loading Samples : 1
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Loading Sample : MINERvA_CC0pi_XSec_1DQ2QE_nu
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Searching for dynamic sample manifests in: /home/nuisance/build/app/
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Loaded 0 from 0 shared object libraries.
+<span class="f5">[LOG Sample]:-- </span>Loading Sample : MINERvA_CC0pi_XSec_1DQ2QE_nu
+<span class="f5">[LOG Sample]:-- </span>Creating GENIEInputHandler : MINERvA_CC0pi_XSec_1DQ2QE_nu
+		|-&gt; Read Max Entries : 100000
+		|-&gt; Total Entries    : 100000
+		|-&gt; Event Integral   : 6.14102e-36 events/nucleon
+		|-&gt; Flux Integral    : 142.944 /cm2
+		|-&gt; Event/Flux       : 4.29612e-38 cm2/nucleon
+
+<span class="f5">[LOG Sample]:-- </span>Registered MINERvA_CC0pi_XSec_1DQ2QE_nu with EventManager.
+<span class="f5">[LOG Sample]:-- </span>Reading data from root file: /home/nuisance/data/MINERvA/CC0pi_1D/FixedBinWidthPub/cov_q2qe_qelike.root;q2qe_cross_section
+<span class="f5">[LOG Sample]:-- </span>Finalising Sample Settings: MINERvA_CC0pi_XSec_1DQ2QE_nu
+<span class="f5">[LOG Sample]:-- </span>Finalising Measurement: MINERvA_CC0pi_XSec_1DQ2QE_nu
+<span class="f1">[ERR FATAL ]: </span>Data error does not match covariance error for bin 1 (0-0.00625)
+<span class="f1">[ERR FATAL ]: </span>Data error: 5.7419e-40
+<span class="f1">[ERR FATAL ]: </span>Cov error:  5.8002e-40
+<span class="f1">[ERR FATAL ]: </span>Data error does not match covariance error for bin 3 (0.0125-0.025)
+<span class="f1">[ERR FATAL ]: </span>Data error: 7.23557e-40
+<span class="f1">[ERR FATAL ]: </span>Cov error:  7.33115e-40
+<span class="f1">[ERR FATAL ]: </span>Data error does not match covariance error for bin 16 (2-4)
+<span class="f1">[ERR FATAL ]: </span>Data error: 4.65479e-42
+<span class="f1">[ERR FATAL ]: </span>Cov error:  4.79306e-42
+</div>
+<p>We're then told where the data is being read from (<code>/home/nuisance/data/MINERvA/CC0pi_1D/FixedBinWidthPub/cov_q2qe_qelike.root</code>) and the histogram (<code>q2qe_cross_section</code>) which it contains. NUISANCE does a number of checks of the data and here notices that for some bins the provided covariance matrix does not agree with the error on the data histogram. In this case the mismatch is 0.1E-40, which isn't too concerning, <b>although definitely is a problem!</b>. Here we contacted the analyser (Dan Ruterbories, Rochester) and this is apparently due to rounding errors in making the covariance matrix. We suggest you do the same if noticing something similar!</p>
+
+<h2>The event loop</h2>
+<p>The main event loop starts once everything has been loaded up successfully. Events are extracted out of the input file, converted to the common format, and event characteristics are calculated (e.g. p<sub>&#956</sub> and cos&#952<sub>&#956</sub> to construct Q<sup>2</sup><sub>QE</sub>). Each event passes through the signal definition defined in the sample, and the generator (MC) histograms are filled up.</p>
+
+<p>The output prints it's running the <code>Compare</code> routine, and starts the first iteration.
+<div class="codebox"><span class="bold"><span class="f2">[LOG Fitter]: </span></span>Running ComparisonRoutines : Compare
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Routine: Compare
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Generating Comparison.
+<span class="f4">[LOG Reconf]:--- </span>Starting Reconfigure iter. 0
+<span class="f4">[LOG Reconf]:--- </span>Event Manager Reconfigure
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 0 events. [M, W] = [13, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 10000 events. [M, W] = [26, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 20000 events. [M, W] = [26, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 30000 events. [M, W] = [26, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 40000 events. [M, W] = [46, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 50000 events. [M, W] = [42, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 60000 events. [M, W] = [26, 1]
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 70000 events. [M, W] = [26, 1]
+<b><u><span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 80000 events. [M, W] = [1, 0.845794]</u></b>
+<span class="f4">[LOG Reconf]:--- </span>MINERvA_CC0pi_XSec_1DQ2QE_nu : Processed 90000 events. [M, W] = [52, 1]
+<span class="f4">[LOG Reconf]:--- </span>Filled 11083 signal events.
+<span class="f4">[LOG Reconf]:--- </span>Time taken ReconfigureUsingManager() : 12
+</div></p>
+<p>
+NUISANCE reports the status of the event loop with 10 prints to screen per reconfigure. So running on 100,000 events will cause a print every 10,000 event. With every print, NUISANCE reports the interaction mode (M) and the weight (W) from the main loop. The interaction modes are documented <a href="interaction_modes.html">here</a>.</p>
+
+<p>The bold underscored line with <code>[M, W] = [1, 0.845794]</code> is a CCQE event (<code>M=1</code>). Since we're running with a variation of the z-expansion parameters we'd expect a CCQE event to receive a weight different to 1, which is indeed the case (<code>W=0.845794</code>). This is useful for debugging purposes, and to see the progress during a fit with <code>nuismin</code>.</p>
+
+<p>Finally the number of signal events (11083 out of 100000) is reported, and the time taken for a full reconfigure (12 s). Hence the looping and reweighting through GENIE ReWeight takes about 0.1 ms/event (N.B. without reweighting the time taken was 7 s).
+
+<h2>The summary</h2>
+<p>The summary of the final state of the program is printed at the end of the routine.</p>
+
+<p>We see a summary of the parameters and their values, and a converted value in real units (which uses <code>nuisance/parameters/dial_conversion.card</code> if available). As expected, we have four z-expansion parameters and one sample normalisation parameter. They are all set to the parameter values provided in the card file.</p>
+
+<p>We also see a likelihood for the sample of <code>-2logL=348.248/16</code>, which means the <code>&chi;<sup>2</sup>=348.248</code> and the number of bins <code>N=16</code>.
+<div class="codebox"><span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Finished Reconfigure iter. 0 in 12s
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>------------
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> #    Parameter                         = Value      +- Error      (Units)  Conv. Val  +- Conv. Err  (Units) 
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> 0  . ZExpA1CCQE                        = 1          +- 0          (sig.)   2.622      +- 0          (x)     
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> 1  . ZExpA2CCQE                        = -1         +- 0          (sig.)   -0.198     +- 0          (x)     
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> 2  . ZExpA3CCQE                        = 1          +- 0          (sig.)   -7.6       +- 0          (x)     
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> 3  . ZExpA4CCQE                        = -1         +- 0          (sig.)   0.575      +- 0          (x)     
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span> 4  . MINERvA_CC0pi_XSec_1DQ2QE_nu_norm = 0.8        +- 0          (sig.)   0.8        +- 0          (sig.)  
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>------------
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Getting likelihoods...                      : -2logL
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>-&gt; MINERvA_CC0pi_XSec_1DQ2QE_nu             : 348.248/16
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Likelihood for JointFCN:                      348.248
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>------------
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Saving current full FCN predictions
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Writing likelihood plot..
+<span class="bold"><span class="f4">[LOG Minmzr]:- </span></span>Writing each of the data classes...
+<span class="f5">[LOG Sample]:-- </span>Written Histograms: MINERvA_CC0pi_XSec_1DQ2QE_nu
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>------------------------------------ -
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>Comparison Complete.
+<span class="bold"><span class="f2">[LOG Fitter]: </span></span>------------------------------------ -
+</div></p>
 
 <hr>
-<h1>Inspecintg <code>nuiscomp</code> output</h1>
+<h1>Inspecting <code>nuiscomp</code> output</h1>
+<p>Once the code has run <code>nuiscomp</code> saves the histograms to a root file (specified by the user giving the <code>-o</code> option).
+</p>
+</body>
+</html>
