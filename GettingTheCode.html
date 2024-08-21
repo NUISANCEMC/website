@@ -24,10 +24,10 @@
             <li><span style="font-weight: bold;">Development</span>: Adding your own datasets or reweight dials into the framework and recompiling NUISANCE before running.</li>
          </ul>
          <div><br/></div>
-         <div>For just “Tuning” cases, for example when working through the NUISANCE tutorials, any download/build method can be used, but if possible distributed binaries (see below) are recommended as these are the easiest to use. </div>
+         <div>For just “tuning” cases, for example when working through the NUISANCE tutorials, any download/build method can be used, but if possible distributed binaries (see below) are recommended as these are the easiest to use. </div>
       </div>
       <div><br/></div>
-      <div>If planning to use NUISANCE for “Development” purposes then you will need to be able to recompile NUISANCE against generators of your choice. This is possible in every method <span style="font-weight: bold;">EXCEPT</span> the precompiled binaries and the docker client.</div>
+      <div>If planning to use NUISANCE for “development” purposes then you will need to be able to recompile NUISANCE against generators of your choice. This is possible in every method <span style="font-weight: bold;">EXCEPT</span> the precompiled binaries and the docker client.</div>
       <div><br/></div>
       <div>The available options are listed in the following sections</div>
       <div><br/></div>
@@ -40,6 +40,20 @@
       <div><br/></div>
       <div>To build NUISANCE from source locally, please see the following page: <a href="/nuisanceinstallation.html">Building The Code</a> </div>
       <div><br/></div>
+
+      <div>
+         <hr/>
+         <div><span style="font-weight: bold;">Singularity/Docker container</span></div>
+      </div>
+      <div>Usage: Tuning / Development</div>
+      <div>Requirements: singularity or docker</div>
+      <p>
+        A container image for use with singularity or docker was made for NuInt24, containing the GENIE, NuWro, and NEUT generators, example scripts of generating events, and scripts to run NUISANCE on generator output. It contains examples for comparing to data, tuning to data, and comparing generators with flat trees. 
+      </p>
+      <p>
+        Tutorial slides can be found <a href=files/talks/NuInt24/intro_container.pdf>here</a>, and the readme is found on our <a href=https://github.com/NUISANCEMC/tutorials/blob/main/interactive/README.md>github</a>.
+      </p>
+
       <div>
          <hr/>
          <div><span style="font-weight: bold;">CernVM File System Release</span></div>
@@ -48,7 +62,13 @@
       <div>Requirements: Linux Machine, CernVM File System</div>
       <div><br/></div>
       <div>This is a common way to access a prebuilt NUISANCE instance on HEP machines. For example the Fermilab gpvm’s all have access to this build. The NUISANCE release is located in the minerva cvmfs area. Don’t worry if you can’t usually see this area when looking in CVMFS on your machine, it just isn’t mounted yet. To setup the NUISANCE CVMFS build please see the following page: <a href="/NUISANCECVMFS.html">NUISANCE CVMFS</a> </div>
-      <div><br/></div>
+      <br/>
+      <br/>
+
+      <h2>Older (unsupported) builds</h2>
+      <p>We additionally provide some pre-built containers and binaries below. However, <strong><u>these are pre-built using an older frozen version of NUISANCE</u></strong>, so newer features and bugfixes won't be supported.</p>
+      <p>As such <u><strong>we don't recommend using them for physics studies</strong></u>.</p>
+      <p>We endeavour to update these soon!</p>
       <div>
          <hr/>
          <div><span style="font-weight: bold;">NUISANCE Virtual Box</span></div>
