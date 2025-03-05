@@ -10,6 +10,15 @@
 </head>
 
 <body>
+
+<label for="meas">Choose measurement:</label>
+<select name="meas" id="meas">
+  <option value="T2K">T2K</option>
+  <option value="MINERvA">MINERvA</option>
+  <option value="MiniBooNE">MiniBooNE</option>
+</select>
+
+
 <div>
   <input type="checkbox" id="checkbox_GENIE" checked/>
   <label for="GENIE">GENIE</label>
@@ -31,16 +40,41 @@
 import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.mjs';
 
   // Helper function to create legend entries
-  function createLegendEntry(obj, label) {
+  function createLegendEntry(obj, label, opt) {
     let entry = create('TLegendEntry');
     entry.fObject = obj;
     entry.fLabel = label;
-    entry.fOption = 'l';
+    entry.fOption = opt || 'l';
     return entry;
   }
 
   //function overlay() {
   async function overlay() {
+
+    // Get histogram from dropdown instead
+    var measurement = document.getElementById("meas");
+    var value = measurement.value;
+    let histname = "";
+    if (value == "T2K") {
+      histname = "T2K_CC1pip_CH_XSec_1Dppi_nu";
+    } else if (value == "MINERvA") {
+      histname = "MINERvA_CC1pip_XSec_1DTpi_nu_2017";
+    } else if (value == "MiniBooNE") {
+      histname = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
+    }
+
+    // The histogram we want from the file
+    let data = await gfile.readObject(histname+"_data;1");
+    let gMC = await gfile.readObject(histname+"_MC;1");
+    let nMC = await nfile.readObject(histname+"_MC;1");
+    let nuMC = await nufile.readObject(histname+"_MC;1");
+    //data.fTitle = 'T2K CC1pi+';
+    if (value == "T2K") {
+      data.fXaxis.fXmax = 2;
+    }
+    nMC.fLineColor = 3;
+    nuMC.fLineColor = 4;
+
     // Clear the old div
     document.getElementById("drawing").innerHTML = "";
     cleanup("drawing");
@@ -64,18 +98,32 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
       histograms.push(nuMC);
     }
 
+    let gTitle = gMC.fTitle;
+    let nTitle = nMC.fTitle;
+    let nuTitle = nuMC.fTitle;
+
+    // Clear out the legend
+    leg.fPrimitives.Clear();
+    leg.fPrimitives.Add(createLegendEntry(data, "Data", "le"));
+    leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
+    leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
+    leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nTitle));
+
     // Loop over the histograms and draw
-    redraw("drawing", histograms[0]);
+    redraw("drawing", histograms[0], "NOSTAT");
     for (var i = 1; i < histograms.length; i++) {
       redraw("drawing", histograms[i], "same,hist");
     }
+    data.fFunctions.Add(leg);
   }
 
   // Add listeners to each box
   document.getElementById("checkbox_GENIE").addEventListener("click", overlay);
   document.getElementById("checkbox_NEUT").addEventListener("click", overlay);
   document.getElementById("checkbox_NuWro").addEventListener("click", overlay);
+  document.getElementById("meas").addEventListener("click", overlay);
 
+  // Load up the files once
   let gfilename = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
   let nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
   let nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
@@ -83,33 +131,14 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   let nfile = await openFile(nfilename);
   let nufile = await openFile(nufilename);
 
-  let data = await gfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_data;1");
-  let gMC = await gfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
-  let nMC = await nfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
-  let nuMC = await nufile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
-  data.fTitle = 'T2K CC1pi+';
-  data.fXaxis.fXmax = 2;
-  data.fXaxis.fTitleOffset = 0.8;
-  data.fYaxis.fXmax = 1.6E-39;
-  nMC.fLineColor = 3;
-  nuMC.fLineColor = 4;
-
   // Make a legend
   let leg = create('TLegend');
   Object.assign(leg, { fX1NDC: 0.5, fY1NDC: 0.5, fX2NDC: 0.9, fY2NDC: 0.9 });
-  let gTitle = gMC.fTitle;
-  let nTitle = nMC.fTitle;
-  let nuTitle = nuMC.fTitle;
-  leg.fPrimitives.Add(createLegendEntry(data, "Data"));
   leg.fLineWidth = 0;
   leg.fLineColor = 0;
   leg.fFillColor = 0;
   leg.fFillStyle = 0;
-
-  leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
-  leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
-  leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nTitle));
-  data.fFunctions.Add(leg);
+  leg.fTextAlign = 12;
 
   // Overlay
   overlay();
