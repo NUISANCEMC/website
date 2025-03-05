@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Interactive NUISANCE data and generator predictions</title>
+<script type="importmap">
+    { "imports": { "jsroot": "../modules/main.mjs" } }
+
+</script>
+</head>
+
+<body>
+<div>
+  <input type="checkbox" id="checkbox_GENIE" checked/>
+  <label for="GENIE">GENIE</label>
+
+  <input type="checkbox" id="checkbox_NEUT" checked />
+  <label for="NEUT">NEUT</label>
+
+  <input type="checkbox" id="checkbox_NuWro" checked />
+  <label for="NuWro">NuWro</label>
+</div>
+
+<div id="drawing" style="position: relative; width: 800px; height: 600px;">
+  Drawing...
+</div>
+
+</body>
+
+<script type="module">
+import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.mjs';
+
+  // Helper function to create legend entries
+  function createLegendEntry(obj, label) {
+    let entry = create('TLegendEntry');
+    entry.fObject = obj;
+    entry.fLabel = label;
+    entry.fOption = 'l';
+    return entry;
+  }
+
+  //function overlay() {
+  async function overlay() {
+    // Clear the old div
+    document.getElementById("drawing").innerHTML = "";
+    cleanup("drawing");
+
+    // Keep a list of the histograms that are requested to be drawn
+    let histograms = []; 
+
+    histograms.push(data);
+
+    var gcheckBox = document.getElementById("checkbox_GENIE");
+    if (gcheckBox.checked == true) {
+      histograms.push(gMC);
+    }
+    var ncheckBox = document.getElementById("checkbox_NEUT");
+    if (ncheckBox.checked == true) {
+      histograms.push(nMC);
+    }
+
+    var nucheckBox = document.getElementById("checkbox_NuWro");
+    if (nucheckBox.checked == true) {
+      histograms.push(nuMC);
+    }
+
+    // Loop over the histograms and draw
+    redraw("drawing", histograms[0]);
+    for (var i = 1; i < histograms.length; i++) {
+      redraw("drawing", histograms[i], "same,hist");
+    }
+  }
+
+  // Add listeners to each box
+  document.getElementById("checkbox_GENIE").addEventListener("click", overlay);
+  document.getElementById("checkbox_NEUT").addEventListener("click", overlay);
+  document.getElementById("checkbox_NuWro").addEventListener("click", overlay);
+
+  let gfilename = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
+  let nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
+  let nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
+  let gfile = await openFile(gfilename);
+  let nfile = await openFile(nfilename);
+  let nufile = await openFile(nufilename);
+
+  let data = await gfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_data;1");
+  let gMC = await gfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
+  let nMC = await nfile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
+  let nuMC = await nufile.readObject("T2K_CC1pip_CH_XSec_1Dppi_nu_MC;1");
+  data.fTitle = 'T2K CC1pi+';
+  data.fXaxis.fXmax = 2;
+  data.fXaxis.fTitleOffset = 0.8;
+  data.fYaxis.fXmax = 1.6E-39;
+  nMC.fLineColor = 3;
+  nuMC.fLineColor = 4;
+
+  // Make a legend
+  let leg = create('TLegend');
+  Object.assign(leg, { fX1NDC: 0.5, fY1NDC: 0.5, fX2NDC: 0.9, fY2NDC: 0.9 });
+  let gTitle = gMC.fTitle;
+  let nTitle = nMC.fTitle;
+  let nuTitle = nuMC.fTitle;
+  leg.fPrimitives.Add(createLegendEntry(data, "Data"));
+  leg.fLineWidth = 0;
+  leg.fLineColor = 0;
+  leg.fFillColor = 0;
+  leg.fFillStyle = 0;
+
+  leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
+  leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
+  leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nTitle));
+  data.fFunctions.Add(leg);
+
+  // Overlay
+  overlay();
+</script>
+</body>
+</html>

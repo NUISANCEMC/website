@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hello</title>
+</head>
+<body>
+<div id="simpleGUI" path="./flat" files="neut_T2K_numu_fhc_flat.root">
+  Drawing flat...
+</div>
+<script type="module">
+import { buildGUI } from './jsroot/modules/gui.mjs';
+            buildGUI("simpleGUI");
+</script>
+</body>
+</html>
