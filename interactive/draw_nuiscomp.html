@@ -5,21 +5,22 @@
 <title>Interactive NUISANCE data and generator predictions</title>
 <script type="importmap">
     { "imports": { "jsroot": "../modules/main.mjs" } }
-
 </script>
 </head>
 
 <body>
 
+<h1>Interactive measurements and generators</h1>
+<p>
+  Select distributions from the drop-down list and overlay selected generators
+</p>
+
 <label for="meas">Choose measurement:</label>
 <select name="meas" id="meas">
-  <option value="T2K">T2K</option>
-  <option value="MINERvA">MINERvA</option>
-  <option value="MiniBooNE">MiniBooNE</option>
 </select>
 
-
 <div>
+  Choose generators:
   <input type="checkbox" id="checkbox_GENIE" checked/>
   <label for="GENIE">GENIE</label>
 
@@ -30,7 +31,7 @@
   <label for="NuWro">NuWro</label>
 </div>
 
-<div id="drawing" style="position: relative; width: 800px; height: 600px;">
+<div id="drawing" style="position: relative; width: 1024px; height: 800px;">
   Drawing...
 </div>
 
@@ -51,27 +52,14 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   //function overlay() {
   async function overlay() {
 
-    // Get histogram from dropdown instead
-    var measurement = document.getElementById("meas");
-    var value = measurement.value;
-    let histname = "";
-    if (value == "T2K") {
-      histname = "T2K_CC1pip_CH_XSec_1Dppi_nu";
-    } else if (value == "MINERvA") {
-      histname = "MINERvA_CC1pip_XSec_1DTpi_nu_2017";
-    } else if (value == "MiniBooNE") {
-      histname = "MiniBooNE_CC1pip_XSec_1DTpi_nu";
-    }
+    // Get histogram from the selected dropdown menu
+    var histname = document.getElementById("meas").value;
 
-    // The histogram we want from the file
+    // Each generator comes from a different root file; read them all in
     let data = await gfile.readObject(histname+"_data;1");
     let gMC = await gfile.readObject(histname+"_MC;1");
     let nMC = await nfile.readObject(histname+"_MC;1");
     let nuMC = await nufile.readObject(histname+"_MC;1");
-    //data.fTitle = 'T2K CC1pi+';
-    if (value == "T2K") {
-      data.fXaxis.fXmax = 2;
-    }
     nMC.fLineColor = 3;
     nuMC.fLineColor = 4;
 
@@ -81,38 +69,58 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
     // Keep a list of the histograms that are requested to be drawn
     let histograms = []; 
-
+    // Always draw the data
     histograms.push(data);
 
+    // Clean up the data histogram a little bit
+    data.fTitle = "";
+    data.fXaxis.fLabelFont = 42;
+    data.fXaxis.fLabelSize = 0.03;
+    data.fXaxis.fTitleFont = 42;
+    data.fXaxis.fTitleSize = 0.035;
+    data.fXaxis.fTitleOffset = 1.0;
+    data.fYaxis.fLabelFont = 42;
+    data.fYaxis.fLabelSize = 0.03;
+    data.fYaxis.fTitleFont = 42;
+    data.fYaxis.fTitleSize = 0.035;
+    data.fYaxis.fTitleOffset = 1.0;
+
+    // Clear out the legend
+    leg.fPrimitives.Clear();
+    // Add in the data in the legend with error drawn
+    leg.fPrimitives.Add(createLegendEntry(data, "Data", "le"));
+
+    // Go through checkboxes and enable which generators should be drawn
     var gcheckBox = document.getElementById("checkbox_GENIE");
     if (gcheckBox.checked == true) {
       histograms.push(gMC);
+      let gTitle = gMC.fTitle;
+      leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
     }
     var ncheckBox = document.getElementById("checkbox_NEUT");
     if (ncheckBox.checked == true) {
       histograms.push(nMC);
+      let nTitle = nMC.fTitle;
+      leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
     }
 
     var nucheckBox = document.getElementById("checkbox_NuWro");
     if (nucheckBox.checked == true) {
       histograms.push(nuMC);
+      let nuTitle = nuMC.fTitle;
+      leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nuTitle));
     }
-
-    let gTitle = gMC.fTitle;
-    let nTitle = nMC.fTitle;
-    let nuTitle = nuMC.fTitle;
-
-    // Clear out the legend
-    leg.fPrimitives.Clear();
-    leg.fPrimitives.Add(createLegendEntry(data, "Data", "le"));
-    leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
-    leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
-    leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nTitle));
 
     // Loop over the histograms and draw
     redraw("drawing", histograms[0], "NOSTAT");
+    var maxi = Math.max(...histograms[0].fArray);
     for (var i = 1; i < histograms.length; i++) {
       redraw("drawing", histograms[i], "same,hist");
+      // Set the maximum on the data
+      var maxi2 = Math.max(...histograms[i].fArray);
+      if (maxi2 > maxi) {
+        histograms[0].fMaximum = maxi2*1.1;
+      }
     }
     data.fFunctions.Add(leg);
   }
@@ -131,6 +139,25 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   let nfile = await openFile(nfilename);
   let nufile = await openFile(nufilename);
 
+  // Get each 1D measurement in the file
+  var meas_list = [];
+  for (var i = 0; i < gfile.fKeys.length; ++i) {
+    var keyname = gfile.fKeys[i].fName;
+    if (keyname.includes("_data") &&  // Look for data files
+        !keyname.includes("_data_") && // But not shape or ratio data
+        gfile.fKeys[i].fClassName == "TH1D") { // and make sure they're TH1D
+      var name = gfile.fKeys[i].fName;
+      name = name.replace("_data", "");
+      meas_list.push(name);
+    }
+  }
+  // Now fill in the drop-down menu
+  var fill = document.getElementById("meas");
+  // Now make a drop down menu with each of them
+  for (var i = 0; i < meas_list.length; i++) {
+    fill.innerHTML += '<option name="' + meas_list[i] + '">' + meas_list[i] + '</option>';
+  }
+
   // Make a legend
   let leg = create('TLegend');
   Object.assign(leg, { fX1NDC: 0.5, fY1NDC: 0.5, fX2NDC: 0.9, fY2NDC: 0.9 });
@@ -139,8 +166,9 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   leg.fFillColor = 0;
   leg.fFillStyle = 0;
   leg.fTextAlign = 12;
+  leg.fTextSize = 0.03;
 
-  // Overlay
+  // Do the first overlay
   overlay();
 </script>
 </body>
