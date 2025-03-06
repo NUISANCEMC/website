@@ -11,24 +11,25 @@
 <body>
 
 <h1>Interactive measurements and generators</h1>
+<h3>(this is still work in progress, but feel free to play around)</h3>
 <p>
   Select distributions from the drop-down list and overlay selected generators
 </p>
 
 <label for="meas">Choose measurement:</label>
-<select name="meas" id="meas">
+<select name="meas" id="meas" style="font-size:15pt;">
 </select>
 
 <div>
   Choose generators:
-  <input type="checkbox" id="checkbox_GENIE" checked/>
-  <label for="GENIE">GENIE</label>
+  <input type="checkbox" id="checkbox_GENIE" checked />
+  <label for="GENIE" style="font-size:15pt;">GENIE</label>
 
   <input type="checkbox" id="checkbox_NEUT" checked />
-  <label for="NEUT">NEUT</label>
+  <label for="NEUT" style="font-size:15pt;">NEUT</label>
 
   <input type="checkbox" id="checkbox_NuWro" checked />
-  <label for="NuWro">NuWro</label>
+  <label for="NuWro" style="font-size:15pt;">NuWro</label>
 </div>
 
 <div id="drawing" style="position: relative; width: 1024px; height: 800px;">
@@ -65,7 +66,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
     // Clear the old div
     document.getElementById("drawing").innerHTML = "";
-    cleanup("drawing");
+    await cleanup("drawing");
 
     // Keep a list of the histograms that are requested to be drawn
     let histograms = []; 
@@ -112,16 +113,17 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     }
 
     // Loop over the histograms and draw
-    redraw("drawing", histograms[0], "NOSTAT");
+    const promise = redraw("drawing", histograms[0], "NOSTAT");
     var maxi = Math.max(...histograms[0].fArray);
     for (var i = 1; i < histograms.length; i++) {
-      redraw("drawing", histograms[i], "same,hist");
+      const promise2 = promise.then(redraw("drawing", histograms[i], "same,hist"));
       // Set the maximum on the data
       var maxi2 = Math.max(...histograms[i].fArray);
       if (maxi2 > maxi) {
         histograms[0].fMaximum = maxi2*1.1;
       }
     }
+
     data.fFunctions.Add(leg);
   }
 
@@ -169,7 +171,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   leg.fTextSize = 0.03;
 
   // Do the first overlay
-  overlay();
+  await overlay();
 </script>
 </body>
 </html>

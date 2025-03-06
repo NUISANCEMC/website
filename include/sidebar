@@ -4,11 +4,12 @@
 
 <h3>Help</h3>
 <li><a href="/GettingTheCode.html">Getting the code</a></li>
-<li><a href="/nuisancesamples.html">Sample list</a></li>
+<li><a href="/interactive/draw_nuiscomp.html">Interactive drawing</a></li>
+<li><a href="/nuisancesamples.html">Measurements and samples list</a></li>
 <li><a href="/mcfilehosting.html">Monte-Carlo event files</a></li>
 <li><a href="/bubble_chambers.html">Bubble chamber data</a></li>
 
-<h3>Guides</h3>
+<h3>Guides and tutorials</h3>
 <li><a href="/tutorials/general.html">Tutorials</a></li>
 <li><a href="/nuisancetalks.html">Workshop tutorials, talks, publications</a></li>
 <li><a href="/TutorialEvents.html">Tutorial event files</a></li>
