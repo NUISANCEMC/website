@@ -217,7 +217,10 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
       meas_list.push(name);
     }
   }
-  // Now fill in the drop-down menu
+  // Sort list alphabetically
+  meas_list.sort();
+
+  // Fill the drop-down menu
   var fill = document.getElementById("meas");
   // Now make a drop down menu with each of them
   for (var i = 0; i < meas_list.length; i++) {
