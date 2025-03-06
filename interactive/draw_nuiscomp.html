@@ -16,12 +16,23 @@
   Select distributions from the drop-down list and overlay selected generators
 </p>
 
+<table>
+  <tr>
+    <td>
 <label for="meas">Choose measurement:</label>
+</td>
+<td>
 <select name="meas" id="meas" style="font-size:15pt;">
 </select>
+</td>
+</tr>
 
+<tr>
 <div>
+  <td>
   Choose generators:
+</td>
+<td>
   <input type="checkbox" id="checkbox_GENIE" checked />
   <label for="GENIE" style="font-size:15pt;">GENIE</label>
 
@@ -30,12 +41,21 @@
 
   <input type="checkbox" id="checkbox_NuWro" checked />
   <label for="NuWro" style="font-size:15pt;">NuWro</label>
+</td>
 </div>
+</tr>
 
+<tr>
+  <td>
+  </td>
+  <td>
 <div>
   <input type="checkbox" id="checkbox_shape"/>
   <label for="shape" style="font-size:15pt;">Overlay shape predictions</label>
 </div>
+</td>
+</tr>
+</table>
 
 
 <div id="drawing" style="position: relative; width: 1024px; height: 800px;">
@@ -118,7 +138,8 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     // Clear out the legend
     leg.fPrimitives.Clear();
     // Add in the data in the legend with error drawn
-    leg.fPrimitives.Add(createLegendEntry(data, "Data", "le"));
+    var title = "Data, N_{bins}="+data.fXaxis.fNbins;
+    leg.fPrimitives.Add(createLegendEntry(data, title, "le"));
 
     // Go through checkboxes and enable which generators should be drawn
     var gcheckBox = document.getElementById("checkbox_GENIE");
