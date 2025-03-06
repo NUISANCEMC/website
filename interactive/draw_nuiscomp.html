@@ -32,6 +32,12 @@
   <label for="NuWro" style="font-size:15pt;">NuWro</label>
 </div>
 
+<div>
+  <input type="checkbox" id="checkbox_shape"/>
+  <label for="shape" style="font-size:15pt;">Overlay shape predictions</label>
+</div>
+
+
 <div id="drawing" style="position: relative; width: 1024px; height: 800px;">
   Drawing...
 </div>
@@ -61,8 +67,16 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     let gMC = await gfile.readObject(histname+"_MC;1");
     let nMC = await nfile.readObject(histname+"_MC;1");
     let nuMC = await nufile.readObject(histname+"_MC;1");
+    // Add the shape histograms
+    let gMC_s = await gfile.readObject(histname+"_MC_SHAPE;1");
+    let nMC_s = await nfile.readObject(histname+"_MC_SHAPE;1");
+    let nuMC_s = await nufile.readObject(histname+"_MC_SHAPE;1");
+
     nMC.fLineColor = 3;
     nuMC.fLineColor = 4;
+    nMC_s.fLineColor = nMC.fLineColor;
+    nuMC_s.fLineColor = nuMC.fLineColor;
+
     // Set the maximum on the data
     var max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
     data.fMaximum = max*1.1;
@@ -70,10 +84,18 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     gMC.fName = "GENIE";
     nMC.fName = "NEUT";
     nuMC.fName = "NuWro";
+    gMC_s.fName = "GENIE shape";
+    nMC_s.fName = "NEUT shape";
+    nuMC_s.fName = "NuWro shape";
+    gMC_s.fLineWidth = 1;
+    nMC_s.fLineWidth = 1;
+    nuMC_s.fLineWidth = 1;
+
+    var inc_shape = document.getElementById("checkbox_shape");
 
     // Clear the old div
-    document.getElementById("drawing").innerHTML = "";
     await cleanup("drawing");
+    document.getElementById("drawing").innerHTML = "";
 
     // Keep a list of the histograms that are requested to be drawn
     let histograms = []; 
@@ -104,12 +126,22 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
       histograms.push(gMC);
       let gTitle = gMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
+      if (inc_shape.checked == true) {
+        histograms.push(gMC_s);
+        let gTitle_s = gMC_s.fTitle;
+        leg.fPrimitives.Add(createLegendEntry(gMC_s, "GENIE, norm="+gTitle_s));
+      }
     }
     var ncheckBox = document.getElementById("checkbox_NEUT");
     if (ncheckBox.checked == true) {
       histograms.push(nMC);
       let nTitle = nMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
+      if (inc_shape.checked == true) {
+        histograms.push(nMC_s);
+        let nTitle_s = nMC_s.fTitle;
+        leg.fPrimitives.Add(createLegendEntry(nMC_s, "NEUT, norm="+nTitle_s));
+      }
     }
 
     var nucheckBox = document.getElementById("checkbox_NuWro");
@@ -117,12 +149,22 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
       histograms.push(nuMC);
       let nuTitle = nuMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nuTitle));
+      if (inc_shape.checked == true) {
+        histograms.push(nuMC_s);
+        let nuTitle_s = nuMC_s.fTitle;
+        leg.fPrimitives.Add(createLegendEntry(nuMC_s, "NuWro, norm="+nuTitle_s));
+      }
     }
 
     // Loop over the histograms and draw
     const promise = redraw("drawing", histograms[0], "NOSTAT");
     for (var i = 1; i < histograms.length; i++) {
-      const promise2 = promise.then(redraw("drawing", histograms[i], "same,hist"));
+      var promise2;
+      if (i == 1) {
+        promise2 = promise.then(redraw("drawing", histograms[i], "same,hist"));
+      } else {
+        promise2 = promise2.then(redraw("drawing", histograms[i], "same,hist"));
+      }
     }
     data.fFunctions.Add(leg);
   }
@@ -131,6 +173,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   document.getElementById("checkbox_GENIE").addEventListener("click", overlay);
   document.getElementById("checkbox_NEUT").addEventListener("click", overlay);
   document.getElementById("checkbox_NuWro").addEventListener("click", overlay);
+  document.getElementById("checkbox_shape").addEventListener("click", overlay);
   document.getElementById("meas").addEventListener("click", overlay);
 
   // Load up the files once
