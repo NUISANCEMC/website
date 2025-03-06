@@ -63,6 +63,13 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     let nuMC = await nufile.readObject(histname+"_MC;1");
     nMC.fLineColor = 3;
     nuMC.fLineColor = 4;
+    // Set the maximum on the data
+    var max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
+    data.fMaximum = max*1.1;
+    data.fName = "Data";
+    gMC.fName = "GENIE";
+    nMC.fName = "NEUT";
+    nuMC.fName = "NuWro";
 
     // Clear the old div
     document.getElementById("drawing").innerHTML = "";
@@ -114,16 +121,9 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
     // Loop over the histograms and draw
     const promise = redraw("drawing", histograms[0], "NOSTAT");
-    var maxi = Math.max(...histograms[0].fArray);
     for (var i = 1; i < histograms.length; i++) {
       const promise2 = promise.then(redraw("drawing", histograms[i], "same,hist"));
-      // Set the maximum on the data
-      var maxi2 = Math.max(...histograms[i].fArray);
-      if (maxi2 > maxi) {
-        histograms[0].fMaximum = maxi2*1.1;
-      }
     }
-
     data.fFunctions.Add(leg);
   }
 
