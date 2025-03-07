@@ -6,13 +6,12 @@
 <li><a href="/GettingTheCode.html">Getting the code</a></li>
 <li><a href="/interactive/draw_nuiscomp.html">Interactive drawing</a></li>
 <li><a href="/nuisancesamples.html">Measurements and samples list</a></li>
-<li><a href="/mcfilehosting.html">Monte-Carlo event files</a></li>
 <li><a href="/bubble_chambers.html">Bubble chamber data</a></li>
 
 <h3>Guides and tutorials</h3>
 <li><a href="/tutorials/general.html">Tutorials</a></li>
+<li><a href="/mcfilehosting.html">Pre-generated event files</a></li>
 <li><a href="/nuisancetalks.html">Workshop tutorials, talks, publications</a></li>
-<li><a href="/TutorialEvents.html">Tutorial event files</a></li>
 
 <h3>Wiki</h3>
 <li><a href="/trac/wiki">NUISANCE wiki</a></li>
@@ -27,11 +26,10 @@
 
 <h3>Releases and citing</h3>
 <li><a href="/citingnuisance.html">Citing NUISANCE</a></li>
-<li><a href="/nuisancereleases.html">Releases</a></li>
 <li><a href="/nuisancepaper.html">Review</a></li>      
 <li><a href="/validationplots.html">Validations</a></li>
 
-<h3>Development</h3>
+<h3>Contact</h3>
 <li><a href="https://github.com/NUISANCEMC/nuisance">Github</a></li>
 <li><a href="https://nuisance-xsec.slack.com/">Slack</a></li>
 <!--
@@ -39,4 +37,4 @@
 <li><a href="/trac/roadmap">Roadmap</a></li>
 <li><a href="/trac/report/3">Issue Tracker</a></li>
 -->
-<li><a href="mailto:nuisance@projects.hepforge.org">Contact developers</a></li>
+<li><a href="mailto:nuisance@projects.hepforge.org">Email list</a></li>
