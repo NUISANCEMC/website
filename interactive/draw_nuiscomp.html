@@ -13,7 +13,9 @@
 <h1>Interactive measurements and generators</h1>
 <h3>(this is still work in progress, but feel free to play around)</h3>
 <p>
-  Select distributions from the drop-down list and overlay selected generators
+Select distributions from the drop-down list and overlay selected generators. 
+<br/>
+The output is that from the <code>nuiscomp</code> executable included in NUISANCE.
 </p>
 
 <table>
@@ -92,6 +94,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     let nMC_s = await nfile.readObject(histname+"_MC_SHAPE;1");
     let nuMC_s = await nufile.readObject(histname+"_MC_SHAPE;1");
 
+    gMC.fLineColor = 2;
     nMC.fLineColor = 3;
     nuMC.fLineColor = 4;
     nMC_s.fLineColor = nMC.fLineColor;
@@ -141,9 +144,11 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     var title = "Data, N_{bins}="+data.fXaxis.fNbins;
     leg.fPrimitives.Add(createLegendEntry(data, title, "le"));
 
+    var nplots = 1;
     // Go through checkboxes and enable which generators should be drawn
     var gcheckBox = document.getElementById("checkbox_GENIE");
     if (gcheckBox.checked == true) {
+      nplots += 1;
       histograms.push(gMC);
       let gTitle = gMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
@@ -155,6 +160,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     }
     var ncheckBox = document.getElementById("checkbox_NEUT");
     if (ncheckBox.checked == true) {
+      nplots += 1;
       histograms.push(nMC);
       let nTitle = nMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
@@ -167,6 +173,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
     var nucheckBox = document.getElementById("checkbox_NuWro");
     if (nucheckBox.checked == true) {
+      nplots += 1;
       histograms.push(nuMC);
       let nuTitle = nuMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nuTitle));
@@ -179,6 +186,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
     // Loop over the histograms and draw
     const promise = redraw("drawing", histograms[0], "NOSTAT");
+    leg.fNColumns = nplots;
     for (var i = 1; i < histograms.length; i++) {
       var promise2;
       if (i == 1) {
@@ -229,13 +237,13 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
 
   // Make a legend
   let leg = create('TLegend');
-  Object.assign(leg, { fX1NDC: 0.5, fY1NDC: 0.5, fX2NDC: 0.9, fY2NDC: 0.9 });
+  Object.assign(leg, { fX1NDC: 0.17, fY1NDC: 0.9, fX2NDC: 0.9, fY2NDC: 0.94 });
   leg.fLineWidth = 0;
   leg.fLineColor = 0;
   leg.fFillColor = 0;
   leg.fFillStyle = 0;
   leg.fTextAlign = 12;
-  leg.fTextSize = 0.03;
+  leg.fTextSize = 0.022;
 
   // Do the first overlay
   await overlay();
