@@ -36,13 +36,13 @@ The output is that from the <code>nuiscomp</code> executable included in NUISANC
 </td>
 <td>
   <input type="checkbox" id="checkbox_GENIE" checked />
-  <label for="GENIE" style="font-size:15pt;">GENIE</label>
+  <label for="checkbox_GENIE" style="font-size:15pt;">GENIE</label>
 
   <input type="checkbox" id="checkbox_NEUT" checked />
-  <label for="NEUT" style="font-size:15pt;">NEUT</label>
+  <label for="checkbox_NEUT" style="font-size:15pt;">NEUT</label>
 
   <input type="checkbox" id="checkbox_NuWro" checked />
-  <label for="NuWro" style="font-size:15pt;">NuWro</label>
+  <label for="checkbox_NuWro" style="font-size:15pt;">NuWro</label>
 </td>
 </div>
 </tr>
@@ -53,7 +53,7 @@ The output is that from the <code>nuiscomp</code> executable included in NUISANC
   <td>
 <div>
   <input type="checkbox" id="checkbox_shape"/>
-  <label for="shape" style="font-size:15pt;">Overlay shape predictions</label>
+  <label for="checkbox_shape" style="font-size:15pt;">Overlay shape predictions</label>
 </div>
 </td>
 </tr>
@@ -63,11 +63,12 @@ The output is that from the <code>nuiscomp</code> executable included in NUISANC
 <div id="drawing" style="position: relative; width: 1024px; height: 800px;">
   Drawing...
 </div>
+<br/>
 
 </body>
 
 <script type="module">
-import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.mjs';
+import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.mjs';
 
   // Helper function to create legend entries
   function createLegendEntry(obj, label, opt) {
@@ -114,8 +115,6 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     nMC_s.fLineWidth = 1;
     nuMC_s.fLineWidth = 1;
 
-    var inc_shape = document.getElementById("checkbox_shape");
-
     // Clear the old div
     await cleanup("drawing");
     document.getElementById("drawing").innerHTML = "";
@@ -126,7 +125,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     histograms.push(data);
 
     // Clean up the data histogram a little bit
-    data.fTitle = "";
+    data.fTitle = histname;
     data.fXaxis.fLabelFont = 42;
     data.fXaxis.fLabelSize = 0.03;
     data.fXaxis.fTitleFont = 42;
@@ -137,6 +136,7 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     data.fYaxis.fTitleFont = 42;
     data.fYaxis.fTitleSize = 0.035;
     data.fYaxis.fTitleOffset = 1.0;
+    data.fYaxis.fCenter = false;
 
     // Clear out the legend
     leg.fPrimitives.Clear();
@@ -144,7 +144,9 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
     var title = "Data, N_{bins}="+data.fXaxis.fNbins;
     leg.fPrimitives.Add(createLegendEntry(data, title, "le"));
 
+    // Number of plots, including data
     var nplots = 1;
+    var inc_shape = document.getElementById("checkbox_shape");
     // Go through checkboxes and enable which generators should be drawn
     var gcheckBox = document.getElementById("checkbox_GENIE");
     if (gcheckBox.checked == true) {
@@ -183,19 +185,14 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
         leg.fPrimitives.Add(createLegendEntry(nuMC_s, "NuWro, norm="+nuTitle_s));
       }
     }
+    leg.fNColumns = nplots;
+    data.fFunctions.Add(leg);
 
     // Loop over the histograms and draw
-    const promise = redraw("drawing", histograms[0], "NOSTAT");
-    leg.fNColumns = nplots;
+    await redraw("drawing", histograms[0]);
     for (var i = 1; i < histograms.length; i++) {
-      var promise2;
-      if (i == 1) {
-        promise2 = promise.then(redraw("drawing", histograms[i], "same,hist"));
-      } else {
-        promise2 = promise2.then(redraw("drawing", histograms[i], "same,hist"));
-      }
+      await draw("drawing", histograms[i], "same,hist");
     }
-    data.fFunctions.Add(leg);
   }
 
   // Add listeners to each box
@@ -244,6 +241,11 @@ import { create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.m
   leg.fFillStyle = 0;
   leg.fTextAlign = 12;
   leg.fTextSize = 0.022;
+
+  // Remove the stat box
+  gStyle.fOptStat = 0;
+  // Force not center title
+  EAxisBits.kCenterTitle = false;
 
   // Do the first overlay
   await overlay();
