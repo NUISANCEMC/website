@@ -8,15 +8,24 @@
   </script>
 </head>
 
+<!-- 
+todo: 
+* data/MC ratios overlaid? 
+* chi2 N-1 when generator boxes are clicked
+* Calculate chi2 on-the-fly (we have everything we need)
+-->
+
 <body>
 
 <h1>
   Interactive measurements and generators
 </h1>
 <p>
-  Select distributions from the drop-down list and overlay selected generators. 
+  Select the measurements you want to check from the drop-down list, and overlay selected generators. 
 <br/>
   The output is from the <code>nuiscomp</code> executable in NUISANCE.
+  <br/>
+  (all of the heavy-lifting in plotting is done by <a href="https://root.cern.ch/js/">jsroot</a>)
 </p>
 <p>
 For details on the input generators and specifications, <br/>
@@ -95,13 +104,13 @@ see <a href="https://arxiv.org/pdf/2112.09194#page=4">arxiv:2112.09194 [hep-ex]<
 </table>
 
 
-<div id="drawing" style="position: relative; width:1024px; height:800px;">
+<div id="draw_datamc" style="position: relative; width:1024px; height:800px;">
 </div>
 
-<div id="drawing2" style="position: relative; width:1024px; height:800px;">
+<div id="draw_chi2nm1" style="position: relative; width:1024px; height:800px;">
 </div>
 
-<div id="drawing3" style="position: relative; width:1024px; height:800px;">
+<div id="draw_invcov" style="position: relative; width:1024px; height:800px;">
 </div>
 
 <br/>
@@ -123,10 +132,10 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
   async function overlay() {
 
     // Get histogram from the selected dropdown menu
-    var histname = document.getElementById("meas").value;
+    const histname = document.getElementById("meas").value;
 
     // Check which GENIE is requested
-    var gver = document.getElementById("genie_version").value;
+    const gver = document.getElementById("genie_version").value;
     // Only draw one GENIE version at a time
     let gfile;
     if      (gver == 'G18_02a') gfile = gfile_02a;
@@ -173,20 +182,20 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     const max_stack = Math.max(gMC_mode.fHists.arr.length, nMC_mode.fHists.arr.length, nuMC_mode.fHists.arr.length);
     // Build legend of modes
     leg2.fPrimitives.Clear();
-    for (var i = 0; i < gMC_mode.fHists.arr.length; i++) {
+    for (let i = 0; i < gMC_mode.fHists.arr.length; i++) {
       leg2.fPrimitives.Add(createLegendEntry(gMC_mode.fHists.arr[i], gMC_mode.fHists.arr[i].fTitle, "l"));
       gMC_mode.fHists.arr[i].fFillStyle = 0;
       gMC_mode.fHists.arr[i].fLineStyle = 7;
       gMC_mode.fHists.arr[i].fLineWidth = 1;
       //gMC_mode.fHists.arr[i].fLineColor = gMC.fLineColor;
     }
-    for (var i = 0; i < nMC_mode.fHists.arr.length; i++) {
+    for (let i = 0; i < nMC_mode.fHists.arr.length; i++) {
       nMC_mode.fHists.arr[i].fFillStyle = 0;
       nMC_mode.fHists.arr[i].fLineStyle = 9;
       nMC_mode.fHists.arr[i].fLineWidth = 1;
       //nMC_mode.fHists.arr[i].fLineColor = nMC.fLineColor;
     }
-    for (var i = 0; i < nuMC_mode.fHists.arr.length; i++) {
+    for (let i = 0; i < nuMC_mode.fHists.arr.length; i++) {
       nuMC_mode.fHists.arr[i].fFillStyle = 0;
       nuMC_mode.fHists.arr[i].fLineStyle = 2;
       nuMC_mode.fHists.arr[i].fLineWidth = 1;
@@ -194,11 +203,11 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     }
 
     // Set the maximum on the data
-    var max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
+    let max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
     data.fMinimum = 0;
     data.fMaximum = max*1.1;
 
-    var max2 = Math.max(...gMC_chi2nm1.fArray, ...nMC_chi2nm1.fArray, ...nuMC_chi2nm1.fArray);
+    let max2 = Math.max(...gMC_chi2nm1.fArray, ...nMC_chi2nm1.fArray, ...nuMC_chi2nm1.fArray);
     gMC_chi2nm1.fMinimum = 0;
     gMC_chi2nm1.fMaximum = max2*1.1;
 
@@ -215,12 +224,12 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     nuMC_s.fLineWidth = 1;
 
     // Clear the old divs
-    await cleanup("drawing");
-    document.getElementById("drawing").innerHTML = "";
-    await cleanup("drawing2");
-    document.getElementById("drawing2").innerHTML = "";
-    await cleanup("drawing3");
-    document.getElementById("drawing3").innerHTML = "";
+    await cleanup("draw_datamc");
+    document.getElementById("draw_datamc").innerHTML = "";
+    await cleanup("draw_chi2nm1");
+    document.getElementById("draw_chi2nm1").innerHTML = "";
+    await cleanup("draw_invcov");
+    document.getElementById("draw_invcov").innerHTML = "";
 
     // Keep a list of the histograms that are requested to be drawn
     let histograms = []; 
@@ -244,47 +253,47 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     // Clear out the legend
     leg.fPrimitives.Clear();
     // Add in the data in the legend with error drawn
-    var title = "Data, N_{bins}="+data.fXaxis.fNbins;
+    let title = "Data, N_{bins}="+data.fXaxis.fNbins;
     leg.fPrimitives.Add(createLegendEntry(data, title, "le"));
 
     // Number of plots, including data
-    var nplots = 1;
-    var inc_shape = document.getElementById("checkbox_shape");
+    let nplots = 1;
+    const inc_shape = document.getElementById("checkbox_shape");
     // Go through checkboxes and enable which generators should be drawn
-    var gcheckBox = document.getElementById("checkbox_GENIE");
+    const gcheckBox = document.getElementById("checkbox_GENIE");
     if (gcheckBox.checked == true) {
       nplots += 1;
       histograms.push(gMC);
-      let gTitle = gMC.fTitle;
+      const gTitle = gMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
       if (inc_shape.checked == true) {
         histograms.push(gMC_s);
-        let gTitle_s = gMC_s.fTitle;
+        const gTitle_s = gMC_s.fTitle;
         leg.fPrimitives.Add(createLegendEntry(gMC_s, "GENIE, norm="+gTitle_s));
       }
     }
-    var ncheckBox = document.getElementById("checkbox_NEUT");
+    const ncheckBox = document.getElementById("checkbox_NEUT");
     if (ncheckBox.checked == true) {
       nplots += 1;
       histograms.push(nMC);
-      let nTitle = nMC.fTitle;
+      const nTitle = nMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
       if (inc_shape.checked == true) {
         histograms.push(nMC_s);
-        let nTitle_s = nMC_s.fTitle;
+        const nTitle_s = nMC_s.fTitle;
         leg.fPrimitives.Add(createLegendEntry(nMC_s, "NEUT, norm="+nTitle_s));
       }
     }
 
-    var nucheckBox = document.getElementById("checkbox_NuWro");
+    const nucheckBox = document.getElementById("checkbox_NuWro");
     if (nucheckBox.checked == true) {
       nplots += 1;
       histograms.push(nuMC);
-      let nuTitle = nuMC.fTitle;
+      const nuTitle = nuMC.fTitle;
       leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nuTitle));
       if (inc_shape.checked == true) {
         histograms.push(nuMC_s);
-        let nuTitle_s = nuMC_s.fTitle;
+        const nuTitle_s = nuMC_s.fTitle;
         leg.fPrimitives.Add(createLegendEntry(nuMC_s, "NuWro, norm="+nuTitle_s));
       }
     }
@@ -294,13 +303,13 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     data.fFunctions.Add(textbox);
 
     // Loop over the histograms and draw
-    await redraw("drawing", histograms[0]);
-    for (var i = 1; i < histograms.length; i++) {
-      await draw("drawing", histograms[i], "same,hist");
+    await redraw("draw_datamc", histograms[0]);
+    for (let i = 1; i < histograms.length; i++) {
+      await draw("draw_datamc", histograms[i], "same,hist");
     }
     
     // Draw the histograms by interaction mode
-    var mode_check = document.getElementById("checkbox_modes");
+    const mode_check = document.getElementById("checkbox_modes");
     if (mode_check.checked == true ) {
       if (gcheckBox.checked == true) {
         gMC_mode.fHists.arr[0].fFunctions.Clear();
@@ -315,34 +324,34 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
         nuMC_mode.fHists.arr[0].fFunctions.Add(leg2);
       }
       if (gcheckBox.checked == true) {
-        await draw("drawing", gMC_mode, "same,hist,nostack");
+        await draw("draw_datamc", gMC_mode, "same,hist,nostack");
       }
       if (ncheckBox.checked == true) {
-        await draw("drawing", nMC_mode, "same,hist,nostack");
+        await draw("draw_datamc", nMC_mode, "same,hist,nostack");
       }
       if (nucheckBox.checked == true) {
-        await draw("drawing", nuMC_mode, "same,hist,nostack");
+        await draw("draw_datamc", nuMC_mode, "same,hist,nostack");
       }
     }
 
     // Draw chi2 N-1
-    var inc_nm1 = document.getElementById("checkbox_chi2nm1");
+    const inc_nm1 = document.getElementById("checkbox_chi2nm1");
     gMC_chi2nm1.fFunctions.Add(leg);
     gMC_chi2nm1.fFunctions.Add(textbox);
     if (inc_nm1.checked == true) {
       // Draw nMinus1 chi2
-      await redraw("drawing2", gMC_chi2nm1, "hist text1");
-      await draw("drawing2", nMC_chi2nm1, "hist text1 same");
-      await draw("drawing2", nuMC_chi2nm1, "hist text1 same");
+      await redraw("draw_chi2nm1", gMC_chi2nm1, "hist text1");
+      await draw("draw_chi2nm1", nMC_chi2nm1, "hist text1 same");
+      await draw("draw_chi2nm1", nuMC_chi2nm1, "hist text1 same");
     }
 
     // Draw inverse covariance
-    var inc_inv = document.getElementById("checkbox_invcov");
+    const inc_inv = document.getElementById("checkbox_invcov");
     if (inc_inv.checked == true) {
       let data_invcov = await gfile.readObject(histname+"_INVCOV;1");
       data_invcov.fFunctions.Add(textbox);
       data_invcov.fTitle = "Inverse covariance matrix";
-      await draw("drawing3", data_invcov, "colz");
+      await draw("draw_invcov", data_invcov, "colz");
     }
   }
 
@@ -358,26 +367,26 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
   document.getElementById("meas").addEventListener("click", overlay);
 
   // Load up the files once
-  let gfilename_10a = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
-  let gfilename_10b = "./nuiscomp/nuiscomp_genie_g1810b0211a_20200907.root";
-  let gfilename_02a = "./nuiscomp/nuiscomp_genie_g1802a0211a_20200907.root";
-  let nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
-  let nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
+  const gfilename_10a = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
+  const gfilename_10b = "./nuiscomp/nuiscomp_genie_g1810b0211a_20200907.root";
+  const gfilename_02a = "./nuiscomp/nuiscomp_genie_g1802a0211a_20200907.root";
+  const nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
+  const nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
 
   const gfile_10a = await openFile(gfilename_10a);
   const gfile_10b = await openFile(gfilename_10b);
   const gfile_02a = await openFile(gfilename_02a);
-  let nfile = await openFile(nfilename);
-  let nufile = await openFile(nufilename);
+  const nfile = await openFile(nfilename);
+  const nufile = await openFile(nufilename);
 
   // Get each 1D measurement in the file
-  var meas_list = [];
-  for (var i = 0; i < nfile.fKeys.length; ++i) {
-    var keyname = nfile.fKeys[i].fName;
+  let meas_list = [];
+  for (let i = 0; i < nfile.fKeys.length; ++i) {
+    const keyname = nfile.fKeys[i].fName;
     if (keyname.includes("_data") &&  // Look for data files
         !keyname.includes("_data_") && // But not shape or ratio data
         nfile.fKeys[i].fClassName == "TH1D") { // and make sure they're TH1D
-      var name = nfile.fKeys[i].fName;
+      let name = nfile.fKeys[i].fName;
       name = name.replace("_data", "");
       meas_list.push(name);
     }
@@ -386,9 +395,9 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
   meas_list.sort();
 
   // Fill the drop-down menu
-  var fill = document.getElementById("meas");
+  const fill = document.getElementById("meas");
   // Now make a drop down menu with each of them
-  for (var i = 0; i < meas_list.length; i++) {
+  for (let i = 0; i < meas_list.length; i++) {
     fill.innerHTML += '<option name="' + meas_list[i] + '">' + meas_list[i] + '</option>';
   }
 
