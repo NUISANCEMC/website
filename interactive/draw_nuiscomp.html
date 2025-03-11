@@ -1,67 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Interactive NUISANCE data and generator predictions</title>
-<script type="importmap">
+  <meta charset="utf-8">
+  <title>Interactive NUISANCE data and generator predictions</title>
+  <script type="importmap">
     { "imports": { "jsroot": "../modules/main.mjs" } }
-</script>
+  </script>
 </head>
 
 <body>
 
-<h1>Interactive measurements and generators</h1>
+<h1>
+  Interactive measurements and generators
+</h1>
 <p>
-Select distributions from the drop-down list and overlay selected generators. 
+  Select distributions from the drop-down list and overlay selected generators. 
 <br/>
-The output is that from the <code>nuiscomp</code> executable included in NUISANCE.
+  The output is from the <code>nuiscomp</code> executable in NUISANCE.
+</p>
+<p>
+For details on the input generators and specifications, <br/>
+see <a href="https://arxiv.org/pdf/2112.09194#page=4">arxiv:2112.09194 [hep-ex]</a> (Phys.Rev.D 105 (2022) 9, 092004).
 </p>
 
 <table>
   <tr>
     <td>
-<label for="meas">Choose measurement:</label>
-</td>
-<td>
-<select name="meas" id="meas" style="font-size:15pt;">
-</select>
-</td>
-</tr>
+      <label for="meas">Choose measurement:</label>
+    </td>
 
-<tr>
-<div>
-  <td>
-  Choose generators:
-</td>
-<td>
-  <input type="checkbox" id="checkbox_GENIE" checked />
-  <label for="checkbox_GENIE" style="font-size:15pt;">GENIE</label>
+    <td>
+      <select name="meas" id="meas" style="font-size:15pt;">
+      </select>
+    </td>
+  </tr>
 
-  <input type="checkbox" id="checkbox_NEUT" checked />
-  <label for="checkbox_NEUT" style="font-size:15pt;">NEUT</label>
+  <tr>
+    <td>
+      Choose generators:
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox_GENIE" checked />
+      <label for="checkbox_GENIE" style="font-size:15pt;">GENIE v3</label>
 
-  <input type="checkbox" id="checkbox_NuWro" checked />
-  <label for="checkbox_NuWro" style="font-size:15pt;">NuWro</label>
-</td>
-</div>
-</tr>
+      <select name="genie_version" id="genie_version">
+        <option value="G18_02a">G18_02a</option>
+        <option value="G18_10a">G18_10a</option>
+        <option value="G18_10b">G18_10b</option>
+      </select>
 
-<tr>
-  <td>
-  </td>
-  <td>
-<div>
-  <input type="checkbox" id="checkbox_shape"/>
-  <label for="checkbox_shape" style="font-size:15pt;">Overlay shape predictions</label>
-</div>
-</td>
-</tr>
+      <input type="checkbox" id="checkbox_NEUT" checked />
+      <label for="checkbox_NEUT" style="font-size:15pt;">NEUT 5.4.0.1</label>
+
+      <input type="checkbox" id="checkbox_NuWro" checked />
+      <label for="checkbox_NuWro" style="font-size:15pt;">NuWro 19.02</label>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox_shape"/>
+      <label for="checkbox_shape" style="font-size:15pt;">Overlay shape predictions</label>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox_modes"/>
+      <label for="checkbox_modes" style="font-size:15pt;">Overlay interaction modes</label>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      Choose statistics:
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox_chi2nm1" />
+      <label for="checkbox_chi2nm1" style="font-size:15pt;">Show N-1 χ<sup>2</sup> distributions</label>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox_invcov" />
+      <label for="checkbox_invcov" style="font-size:15pt;">Show inverse covariance matrix</label>
+    </td>
+  </tr>
 </table>
 
 
-<div id="drawing" style="position: relative; width: 1024px; height: 800px;">
-  Drawing...
+<div id="drawing" style="position: relative; width:1024px; height:800px;">
 </div>
+
+<div id="drawing2" style="position: relative; width:1024px; height:800px;">
+</div>
+
+<div id="drawing3" style="position: relative; width:1024px; height:800px;">
+</div>
+
 <br/>
 
 </body>
@@ -78,31 +120,88 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     return entry;
   }
 
-  //function overlay() {
   async function overlay() {
 
     // Get histogram from the selected dropdown menu
     var histname = document.getElementById("meas").value;
 
+    // Check which GENIE is requested
+    var gver = document.getElementById("genie_version").value;
+    // Only draw one GENIE version at a time
+    let gfile;
+    if      (gver == 'G18_02a') gfile = gfile_02a;
+    else if (gver == 'G18_10a') gfile = gfile_10a;
+    else if (gver == 'G18_10b') gfile = gfile_10b;
+
     // Each generator comes from a different root file; read them all in
     let data = await gfile.readObject(histname+"_data;1");
+
+    // The generator predictions
     let gMC = await gfile.readObject(histname+"_MC;1");
     let nMC = await nfile.readObject(histname+"_MC;1");
     let nuMC = await nufile.readObject(histname+"_MC;1");
+
+    // Broken down by mode for each generator
+    let gMC_mode = await gfile.readObject(histname+"_MODES;1");
+    let nMC_mode = await nfile.readObject(histname+"_MODES;1");
+    let nuMC_mode = await nufile.readObject(histname+"_MODES;1");
+
     // Add the shape histograms
     let gMC_s = await gfile.readObject(histname+"_MC_SHAPE;1");
     let nMC_s = await nfile.readObject(histname+"_MC_SHAPE;1");
     let nuMC_s = await nufile.readObject(histname+"_MC_SHAPE;1");
 
+    let gMC_chi2nm1 = await gfile.readObject(histname+"_Chi2NMinusOne;1");
+    let nMC_chi2nm1 = await nfile.readObject(histname+"_Chi2NMinusOne;1");
+    let nuMC_chi2nm1 = await nufile.readObject(histname+"_Chi2NMinusOne;1");
+
     gMC.fLineColor = 2;
     nMC.fLineColor = 3;
     nuMC.fLineColor = 4;
+    gMC_s.fLineColor = gMC.fLineColor;
     nMC_s.fLineColor = nMC.fLineColor;
     nuMC_s.fLineColor = nuMC.fLineColor;
+    gMC_chi2nm1.fLineColor = gMC.fLineColor;
+    nMC_chi2nm1.fLineColor = nMC.fLineColor;
+    nuMC_chi2nm1.fLineColor = nuMC.fLineColor;
+    gMC_chi2nm1.fMarkerSize = 1;
+    nMC_chi2nm1.fMarkerSize = 1;
+    nuMC_chi2nm1.fMarkerSize = 1;
+    gMC_chi2nm1.fTitle = "#chi^{2} for N-1 bins";
+
+    // Set the fill color for each
+    const max_stack = Math.max(gMC_mode.fHists.arr.length, nMC_mode.fHists.arr.length, nuMC_mode.fHists.arr.length);
+    // Build legend of modes
+    leg2.fPrimitives.Clear();
+    for (var i = 0; i < gMC_mode.fHists.arr.length; i++) {
+      leg2.fPrimitives.Add(createLegendEntry(gMC_mode.fHists.arr[i], gMC_mode.fHists.arr[i].fTitle, "l"));
+      gMC_mode.fHists.arr[i].fFillStyle = 0;
+      gMC_mode.fHists.arr[i].fLineStyle = 7;
+      gMC_mode.fHists.arr[i].fLineWidth = 1;
+      //gMC_mode.fHists.arr[i].fLineColor = gMC.fLineColor;
+    }
+    for (var i = 0; i < nMC_mode.fHists.arr.length; i++) {
+      nMC_mode.fHists.arr[i].fFillStyle = 0;
+      nMC_mode.fHists.arr[i].fLineStyle = 9;
+      nMC_mode.fHists.arr[i].fLineWidth = 1;
+      //nMC_mode.fHists.arr[i].fLineColor = nMC.fLineColor;
+    }
+    for (var i = 0; i < nuMC_mode.fHists.arr.length; i++) {
+      nuMC_mode.fHists.arr[i].fFillStyle = 0;
+      nuMC_mode.fHists.arr[i].fLineStyle = 2;
+      nuMC_mode.fHists.arr[i].fLineWidth = 1;
+      //nuMC_mode.fHists.arr[i].fLineColor = nuMC.fLineColor;
+    }
 
     // Set the maximum on the data
     var max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
+    data.fMinimum = 0;
     data.fMaximum = max*1.1;
+
+    var max2 = Math.max(...gMC_chi2nm1.fArray, ...nMC_chi2nm1.fArray, ...nuMC_chi2nm1.fArray);
+    gMC_chi2nm1.fMinimum = 0;
+    gMC_chi2nm1.fMaximum = max2*1.1;
+
     data.fName = "Data";
     gMC.fName = "GENIE";
     nMC.fName = "NEUT";
@@ -110,13 +209,18 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
     gMC_s.fName = "GENIE shape";
     nMC_s.fName = "NEUT shape";
     nuMC_s.fName = "NuWro shape";
+    data.fLineWidth = 2;
     gMC_s.fLineWidth = 1;
     nMC_s.fLineWidth = 1;
     nuMC_s.fLineWidth = 1;
 
-    // Clear the old div
+    // Clear the old divs
     await cleanup("drawing");
     document.getElementById("drawing").innerHTML = "";
+    await cleanup("drawing2");
+    document.getElementById("drawing2").innerHTML = "";
+    await cleanup("drawing3");
+    document.getElementById("drawing3").innerHTML = "";
 
     // Keep a list of the histograms that are requested to be drawn
     let histograms = []; 
@@ -185,12 +289,60 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
       }
     }
     leg.fNColumns = nplots;
+    data.fFunctions.Clear();
     data.fFunctions.Add(leg);
+    data.fFunctions.Add(textbox);
 
     // Loop over the histograms and draw
     await redraw("drawing", histograms[0]);
     for (var i = 1; i < histograms.length; i++) {
       await draw("drawing", histograms[i], "same,hist");
+    }
+    
+    // Draw the histograms by interaction mode
+    var mode_check = document.getElementById("checkbox_modes");
+    if (mode_check.checked == true ) {
+      if (gcheckBox.checked == true) {
+        gMC_mode.fHists.arr[0].fFunctions.Clear();
+        gMC_mode.fHists.arr[0].fFunctions.Add(leg2);
+      }
+      else if (ncheckBox.checked == true) {
+        nMC_mode.fHists.arr[0].fFunctions.Clear();
+        nMC_mode.fHists.arr[0].fFunctions.Add(leg2);
+      }
+      else if (nucheckBox.checked == true) {
+        nuMC_mode.fHists.arr[0].fFunctions.Clear();
+        nuMC_mode.fHists.arr[0].fFunctions.Add(leg2);
+      }
+      if (gcheckBox.checked == true) {
+        await draw("drawing", gMC_mode, "same,hist,nostack");
+      }
+      if (ncheckBox.checked == true) {
+        await draw("drawing", nMC_mode, "same,hist,nostack");
+      }
+      if (nucheckBox.checked == true) {
+        await draw("drawing", nuMC_mode, "same,hist,nostack");
+      }
+    }
+
+    // Draw chi2 N-1
+    var inc_nm1 = document.getElementById("checkbox_chi2nm1");
+    gMC_chi2nm1.fFunctions.Add(leg);
+    gMC_chi2nm1.fFunctions.Add(textbox);
+    if (inc_nm1.checked == true) {
+      // Draw nMinus1 chi2
+      await redraw("drawing2", gMC_chi2nm1, "hist text1");
+      await draw("drawing2", nMC_chi2nm1, "hist text1 same");
+      await draw("drawing2", nuMC_chi2nm1, "hist text1 same");
+    }
+
+    // Draw inverse covariance
+    var inc_inv = document.getElementById("checkbox_invcov");
+    if (inc_inv.checked == true) {
+      let data_invcov = await gfile.readObject(histname+"_INVCOV;1");
+      data_invcov.fFunctions.Add(textbox);
+      data_invcov.fTitle = "Inverse covariance matrix";
+      await draw("drawing3", data_invcov, "colz");
     }
   }
 
@@ -199,24 +351,33 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
   document.getElementById("checkbox_NEUT").addEventListener("click", overlay);
   document.getElementById("checkbox_NuWro").addEventListener("click", overlay);
   document.getElementById("checkbox_shape").addEventListener("click", overlay);
+  document.getElementById("checkbox_chi2nm1").addEventListener("click", overlay);
+  document.getElementById("checkbox_invcov").addEventListener("click", overlay);
+  document.getElementById("checkbox_modes").addEventListener("click", overlay);
+  document.getElementById("genie_version").addEventListener("click", overlay);
   document.getElementById("meas").addEventListener("click", overlay);
 
   // Load up the files once
-  let gfilename = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
+  let gfilename_10a = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
+  let gfilename_10b = "./nuiscomp/nuiscomp_genie_g1810b0211a_20200907.root";
+  let gfilename_02a = "./nuiscomp/nuiscomp_genie_g1802a0211a_20200907.root";
   let nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
   let nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
-  let gfile = await openFile(gfilename);
+
+  const gfile_10a = await openFile(gfilename_10a);
+  const gfile_10b = await openFile(gfilename_10b);
+  const gfile_02a = await openFile(gfilename_02a);
   let nfile = await openFile(nfilename);
   let nufile = await openFile(nufilename);
 
   // Get each 1D measurement in the file
   var meas_list = [];
-  for (var i = 0; i < gfile.fKeys.length; ++i) {
-    var keyname = gfile.fKeys[i].fName;
+  for (var i = 0; i < nfile.fKeys.length; ++i) {
+    var keyname = nfile.fKeys[i].fName;
     if (keyname.includes("_data") &&  // Look for data files
         !keyname.includes("_data_") && // But not shape or ratio data
-        gfile.fKeys[i].fClassName == "TH1D") { // and make sure they're TH1D
-      var name = gfile.fKeys[i].fName;
+        nfile.fKeys[i].fClassName == "TH1D") { // and make sure they're TH1D
+      var name = nfile.fKeys[i].fName;
       name = name.replace("_data", "");
       meas_list.push(name);
     }
@@ -234,12 +395,32 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
   // Make a legend
   let leg = create('TLegend');
   Object.assign(leg, { fX1NDC: 0.17, fY1NDC: 0.9, fX2NDC: 0.9, fY2NDC: 0.94 });
+  leg.fColumnSeparation = 0.1;
   leg.fLineWidth = 0;
   leg.fLineColor = 0;
   leg.fFillColor = 0;
   leg.fFillStyle = 0;
   leg.fTextAlign = 12;
   leg.fTextSize = 0.022;
+
+  // Make a legend for the by-mode
+  let leg2 = create('TLegend');
+  Object.assign(leg2, { fX1NDC: 0.17, fY1NDC: 0.1, fX2NDC: 0.45, fY2NDC: 0.3 });
+  leg2.fColumnSeparation = 0.1;
+  leg2.fLineWidth = 0;
+  leg2.fLineColor = 0;
+  leg2.fFillColor = 0;
+  leg2.fFillStyle = 0;
+  leg2.fTextAlign = 12;
+  leg2.fTextSize = 0.022;
+
+  // Insert a NUISANCE logo
+  let textbox = create('TPaveText');
+  Object.assign(textbox, { fX1NDC: 0.05, fY1NDC: 0.03, fX2NDC: 0.5, fY2NDC: 0.1 });
+  textbox.AddText("NUISANCE [arXiv:1612.07393]");
+  textbox.fTextSize = 0.035;
+  textbox.fTextColor = 18;
+  textbox.fTextAlign = 11;
 
   // Remove the stat box
   gStyle.fOptStat = 0;
