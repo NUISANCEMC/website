@@ -5,13 +5,7 @@
 <h3>Help</h3>
 <li><a href="/GettingTheCode.html">Getting the code</a></li>
 <li><a href="/interactive/draw_nuiscomp.html">Interactive drawing</a></li>
-<li><a href="/nuisancesamples.html">Measurements and samples list</a></li>
-<li><a href="/bubble_chambers.html">Bubble chamber data</a></li>
-
-<h3>Releases and citing</h3>
-<li><a href="/citingnuisance.html">Citing NUISANCE</a></li>
-<li><a href="/nuisancepaper.html">NUISANCE paper</a></li>      
-<li><a href="/validationplots.html">Validations</a></li>
+<li><a href="/nuisancesamples.html">Measurement list</a></li>
 
 <h3>Guides and tutorials</h3>
 <li><a href="/tutorials/general.html">Tutorials</a></li>
@@ -23,10 +17,16 @@
 <li><a href="/trac/wiki/HowTo">Generator tutorials</a></li>
 <li><a href="/trac/wiki/HowToAddSample">Adding a sample</a></li>
 <li><a href="/trac/wiki/ExperimentList">Experimental data</a></li>
+<li><a href="/bubble_chambers.html">Bubble chamber data</a></li>
 <li><a href="/trac/wiki/ExperimentFlux">Experimental flux</a></li>
 <li><a href="/trac/wiki/Winter2016">Winter 2016 validation</a></li>
 
+<h3>Releases and citing</h3>
+<li><a href="/citingnuisance.html">Citing NUISANCE</a></li>
+<li><a href="/nuisancepaper.html">NUISANCE paper</a></li>      
+<li><a href="/validationplots.html">Validations</a></li>
+
 <h3>Contact</h3>
-<li><a href="https://github.com/NUISANCEMC/nuisance">Github</a></li>
+<li><a href="https://github.com/NUISANCEMC/nuisance">github</a></li>
 <li><a href="https://nuisance-xsec.slack.com/">Slack</a></li>
 <li><a href="mailto:nuisance@projects.hepforge.org">Email list</a></li>
