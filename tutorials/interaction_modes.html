@@ -9,7 +9,7 @@
 <h1>Interaction modes in NUISANCE</h1>
 <p>Being originally written for NEUT comparisons, NUISANCE uses the same interaction mode enumeration as NEUT. We primarily use the available converters (e.g. GENIE's <code>genie::utils::ghep::NeutReactionCode(const GHepRecord *event)</code>), with small modifications to account for changes not implemented in the generators. </p>
 
-<p>Access to the underlying GENIE, NuWro, GiBUU or NEUT event is always possible with the pointers being defined in <code>nuisance/src/InputHandler/BaseFitEvt.h</code> (e.g. <a href="https://phab.hepforge.org/source/nuisancegit/browse/master/src/InputHandler/BaseFitEvt.h$123">here</a> for the GENIE <code>GHepRecord</code>).</p>
+<p>Access to the underlying GENIE, NuWro, GiBUU or NEUT event is always possible with the pointers being defined in <code>nuisance/src/InputHandler/BaseFitEvt.h</code> (e.g. <a href="https://github.com/NUISANCEMC/nuisance/blob/main/src/InputHandler/BaseFitEvt.h#L116">here</a> for the GENIE <code>GHepRecord</code>).</p>
 
 <p><b>Important note:</b> remember that some interaction modes do not translate well between generators. This is true for e.g. single-&pi; production&rarr;multi-&pi; production&rarr;DIS production, which is often defined in terms of pion multiplicity and hadronic mass (W). One generator might call an event with multiple pions at W = 1.9 GeV a multi-&pi; event wheras another would call it a DIS event. Multi-&pi; and DIS events have different interaction codes (21 and 26), so might show large differences between generators. In these cases it might be better to compare the sum of the Multi-&pi; and DIS in some range of W.</p>
 
