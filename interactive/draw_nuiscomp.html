@@ -24,8 +24,6 @@ todo:
   Select the measurements you want to check from the drop-down list, and overlay selected generators. 
 <br/>
   The output is from the <code>nuiscomp</code> executable in NUISANCE.
-  <br/>
-  (all of the heavy-lifting in plotting is done by <a href="https://root.cern.ch/js/">jsroot</a>)
 </p>
 <p>
 For details on the input generators and specifications, <br/>
@@ -180,27 +178,56 @@ import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './js
 
     // Set the fill color for each
     const max_stack = Math.max(gMC_mode.fHists.arr.length, nMC_mode.fHists.arr.length, nuMC_mode.fHists.arr.length);
+    let largest = "genie";
+    if (nMC_mode.fHists.arr.length > nuMC_mode.fHists.arr.length && 
+        nMC_mode.fHists.arr.length > gMC_mode.fHists.arr.length) {
+      largest = "neut";
+    } 
+    if (nuMC_mode.fHists.arr.length > nMC_mode.fHists.arr.length && 
+        nuMC_mode.fHists.arr.length > gMC_mode.fHists.arr.length) {
+      largest = "nuwro";
+    }
+
     // Build legend of modes
     leg2.fPrimitives.Clear();
     for (let i = 0; i < gMC_mode.fHists.arr.length; i++) {
-      leg2.fPrimitives.Add(createLegendEntry(gMC_mode.fHists.arr[i], gMC_mode.fHists.arr[i].fTitle, "l"));
       gMC_mode.fHists.arr[i].fFillStyle = 0;
-      gMC_mode.fHists.arr[i].fLineStyle = 7;
+      //gMC_mode.fHists.arr[i].fLineStyle = 7;
+      //gMC_mode.fHists.arr[i].fLineStyle = i+2;
       gMC_mode.fHists.arr[i].fLineWidth = 1;
-      //gMC_mode.fHists.arr[i].fLineColor = gMC.fLineColor;
+      gMC_mode.fHists.arr[i].fLineColor = gMC.fLineColor;
     }
     for (let i = 0; i < nMC_mode.fHists.arr.length; i++) {
+      leg2.fPrimitives.Add(createLegendEntry(nMC_mode.fHists.arr[i], nMC_mode.fHists.arr[i].fTitle, "l"));
       nMC_mode.fHists.arr[i].fFillStyle = 0;
-      nMC_mode.fHists.arr[i].fLineStyle = 9;
+      //nMC_mode.fHists.arr[i].fLineStyle = 9;
+      //nMC_mode.fHists.arr[i].fLineStyle = i+2;
       nMC_mode.fHists.arr[i].fLineWidth = 1;
-      //nMC_mode.fHists.arr[i].fLineColor = nMC.fLineColor;
+      nMC_mode.fHists.arr[i].fLineColor = nMC.fLineColor;
     }
     for (let i = 0; i < nuMC_mode.fHists.arr.length; i++) {
       nuMC_mode.fHists.arr[i].fFillStyle = 0;
-      nuMC_mode.fHists.arr[i].fLineStyle = 2;
+      //nuMC_mode.fHists.arr[i].fLineStyle = 2;
+      //nuMC_mode.fHists.arr[i].fLineStyle = i+2;
       nuMC_mode.fHists.arr[i].fLineWidth = 1;
-      //nuMC_mode.fHists.arr[i].fLineColor = nuMC.fLineColor;
+      nuMC_mode.fHists.arr[i].fLineColor = nuMC.fLineColor;
     }
+
+    // Try to clear up different modes
+    // CCQE
+    gMC_mode.fHists.arr[0].fLineStyle = nMC_mode.fHists.arr[0].fLineStyle = nuMC_mode.fHists.arr[0].fLineStyle = 2;
+    // 2p2h
+    gMC_mode.fHists.arr[1].fLineStyle = nMC_mode.fHists.arr[1].fLineStyle = nuMC_mode.fHists.arr[1].fLineStyle = 3;
+    // CC1pi+1p
+    gMC_mode.fHists.arr[2].fLineStyle = nMC_mode.fHists.arr[2].fLineStyle = nuMC_mode.fHists.arr[2].fLineStyle = 9;
+    // CC1pi0
+    gMC_mode.fHists.arr[3].fLineStyle = nMC_mode.fHists.arr[3].fLineStyle = nuMC_mode.fHists.arr[3].fLineStyle = 6;
+    // CC1pi+1n
+    gMC_mode.fHists.arr[4].fLineStyle = nMC_mode.fHists.arr[4].fLineStyle = nuMC_mode.fHists.arr[4].fLineStyle = 4;
+    // Multi-pi
+    gMC_mode.fHists.arr[5].fLineStyle = nMC_mode.fHists.arr[5].fLineStyle = nuMC_mode.fHists.arr[5].fLineStyle = 7;
+    // DIS
+    gMC_mode.fHists.arr[6].fLineStyle = nMC_mode.fHists.arr[6].fLineStyle = nuMC_mode.fHists.arr[6].fLineStyle = 10;
 
     // Set the maximum on the data
     let max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
