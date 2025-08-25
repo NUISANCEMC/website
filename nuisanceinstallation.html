@@ -70,11 +70,11 @@ The clone will default to the head development version: </p>
 <div class="note">
   <ul>
     <li><strong>To force NUISANCE to compile WITH minimizer, add</strong><br>
-    <span class="codebox">$ -DUSE_MINIMIZER=1</span><br>
+    <span class="codebox">$ -DMINIMIZER_ENABLED=ON</span><br>
     to your cmake build defines.
     </li>
     <li>e.g. for GENIE<br>
-    <span class="codebox">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=1</span>
+    <span class="codebox">$ cmake ../ -DGENIE_ENABLED=ON -DMINIMIZER_ENABLED=ON</span>
   </ul>
 </div>
 
@@ -86,10 +86,10 @@ The clone will default to the head development version: </p>
 <div class="note">
   <ul>
     <li><strong>To force NUISANCE to compile WITHOUT minimizer, add</strong><br>
-    <span class="codebox">$ -DUSE_MINIMIZER=0</span><br>
+    <span class="codebox">$ -DMINIMIZER_ENABLED=OFF</span><br>
     to your cmake build defines. <br></li>
     <li>e.g. for GENIE<br>
-    <span class="codebox">$ cmake ../ -DUSE_GENIE=1 -DUSE_MINIMIZER=0</span>
+    <span class="codebox">$ cmake ../ -DGENIE_ENABLED=ON -DMINIMIZER_ENABLED=OFF</span>
     </li>
   </ul>
 </div>
@@ -142,7 +142,7 @@ $ echo $GENIE<br></span>
       <span class="codebox">$ cd nuisance
 $ mkdir build
 $ cd build
-$ cmake ../ -DUSE_GENIE=1
+$ cmake ../ -DGENIE_ENABLED=ON
 $ make
 $ make docs
 $ make install
@@ -174,10 +174,10 @@ $ mkdir build
 $ cd build</span></li>
 
       <li><strong>Set the compiler flags for the generators:</strong><br>
-      <span class="codebox">$ cmake -DUSE_NuWro=1 -DUSE_NEUT=1 -DUSE_GENIE=1 -DUSE_GiBUU=1 -DUSE_NUANCE=1 ../</span>
-      <span class="code">-DUSE_GENERATOR</span> tells the compiler to compile against chosen generator, granted environment variables are set. The default is to set generators to 0.<br><br>
+      <span class="codebox">$ cmake -DNuWro_ENABLED=ON -DNEUT_ENABLED=ON -DGENIE_ENABLED=ON -DGiBUU_ENABLED=ON -DNUANCE_ENABLED=ON ../</span>
+      <span class="code">-DGENERATOR_ENABLED=ON</span> tells the compiler to compile against chosen generator, granted environment variables are set. The default is to set generators to 0.<br><br>
 
-      E.g. <span class="code">$ cmake ../ -DUSE_NUWRO=1</span> enables NuWro alone.<br><br>
+      E.g. <span class="code">$ cmake ../ -DNUWRO_ENABLED=ON</span> enables NuWro alone.<br><br>
 
       Furthermore, NUISANCE can build GiBUU with <span class="code">$-DBUILD_GiBUU=1</span> in cmake command.</li>
 
