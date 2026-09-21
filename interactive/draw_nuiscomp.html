@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Interactive NUISANCE data and generator predictions</title>
@@ -8,463 +9,585 @@
   </script>
 </head>
 
-<!-- 
-todo: 
-* data/MC ratios overlaid? 
-* chi2 N-1 when generator boxes are clicked
+<!--
+todo:
+* data/MC ratios overlaid?
 * Calculate chi2 on-the-fly (we have everything we need)
 -->
 
-<body>
+<body class="full-height">
+        <h1>Interactive measurements and generators</h1>
+        <p>
+          Select the measurements you want to check from the drop-down list, and overlay selected generators.
+          <br>
+          The output comes from the <code>nuiscomp</code> executable in NUISANCE.
+        </p>
+        <p>
+          For details on the input generators and specifications,<br>
+          see <a href="https://arxiv.org/pdf/2112.09194#page=4">arxiv:2112.09194 [hep-ex]</a>
+          (Phys.Rev.D 105 (2022) 9, 092004).
+        </p>
 
-<h1>
-  Interactive measurements and generators
-</h1>
-<p>
-  Select the measurements you want to check from the drop-down list, and overlay selected generators. 
-<br/>
-  The output is from the <code>nuiscomp</code> executable in NUISANCE.
-</p>
-<p>
-For details on the input generators and specifications, <br/>
-see <a href="https://arxiv.org/pdf/2112.09194#page=4">arxiv:2112.09194 [hep-ex]</a> (Phys.Rev.D 105 (2022) 9, 092004).
-</p>
+        <table>
+          <tr>
+            <td><label for="meas">Choose measurement:</label></td>
+            <td>
+              <select name="meas" id="meas" class="ctrl-select"></select>
+            </td>
+          </tr>
+          <tr>
+            <td>Choose generators:</td>
+            <td class="gen-controls">
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_GENIE" checked>
+                GENIE v3
+              </label>
+              <select name="genie_version" id="genie_version" class="ctrl-select">
+                <option value="G18_02a">G18_02a</option>
+                <option value="G18_10a">G18_10a</option>
+                <option value="G18_10b">G18_10b</option>
+              </select>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_NEUT" checked>
+                NEUT 5.4.0.1
+              </label>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_NuWro" checked>
+                NuWro 19.02
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_shape">
+                Overlay shape predictions
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_modes">
+                Overlay interaction modes
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>Choose statistics:</td>
+            <td>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_chi2nm1">
+                Show N-1 χ<sup>2</sup> distributions
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <label class="ctrl-label">
+                <input type="checkbox" id="checkbox_invcov">
+                Show inverse covariance matrix
+              </label>
+            </td>
+          </tr>
+        </table>
 
-<table>
-  <tr>
-    <td>
-      <label for="meas">Choose measurement:</label>
-    </td>
+        <!-- Error banner (hidden until needed) -->
+        <div id="error-banner" style="display:none;" class="error-banner"></div>
 
-    <td>
-      <select name="meas" id="meas" style="font-size:15pt;">
-      </select>
-    </td>
-  </tr>
+        <div id="draw_datamc"  class="jsroot-pad"></div>
+        <div id="draw_chi2nm1" class="jsroot-pad"></div>
+        <div id="draw_invcov"  class="jsroot-pad"></div>
 
-  <tr>
-    <td>
-      Choose generators:
-    </td>
-    <td>
-      <input type="checkbox" id="checkbox_GENIE" checked />
-      <label for="checkbox_GENIE" style="font-size:15pt;">GENIE v3</label>
-
-      <select name="genie_version" id="genie_version">
-        <option value="G18_02a">G18_02a</option>
-        <option value="G18_10a">G18_10a</option>
-        <option value="G18_10b">G18_10b</option>
-      </select>
-
-      <input type="checkbox" id="checkbox_NEUT" checked />
-      <label for="checkbox_NEUT" style="font-size:15pt;">NEUT 5.4.0.1</label>
-
-      <input type="checkbox" id="checkbox_NuWro" checked />
-      <label for="checkbox_NuWro" style="font-size:15pt;">NuWro 19.02</label>
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-    </td>
-    <td>
-      <input type="checkbox" id="checkbox_shape"/>
-      <label for="checkbox_shape" style="font-size:15pt;">Overlay shape predictions</label>
-    </td>
-  </tr>
-  <tr>
-    <td>
-    </td>
-    <td>
-      <input type="checkbox" id="checkbox_modes"/>
-      <label for="checkbox_modes" style="font-size:15pt;">Overlay interaction modes</label>
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-      Choose statistics:
-    </td>
-    <td>
-      <input type="checkbox" id="checkbox_chi2nm1" />
-      <label for="checkbox_chi2nm1" style="font-size:15pt;">Show N-1 χ<sup>2</sup> distributions</label>
-    </td>
-  </tr>
-
-  <tr>
-    <td>
-    </td>
-    <td>
-      <input type="checkbox" id="checkbox_invcov" />
-      <label for="checkbox_invcov" style="font-size:15pt;">Show inverse covariance matrix</label>
-    </td>
-  </tr>
-</table>
-
-
-<div id="draw_datamc" style="position: relative; width:1024px; height:800px;">
-</div>
-
-<div id="draw_chi2nm1" style="position: relative; width:1024px; height:800px;">
-</div>
-
-<div id="draw_invcov" style="position: relative; width:1024px; height:800px;">
-</div>
-
-<br/>
-
-</body>
-
-<script type="module">
-import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup } from './jsroot/modules/main.mjs';
-
-  // Helper function to create legend entries
-  function createLegendEntry(obj, label, opt) {
-    let entry = create('TLegendEntry');
-    entry.fObject = obj;
-    entry.fLabel = label;
-    entry.fOption = opt || 'l';
-    return entry;
-  }
-
-  async function overlay() {
-
-    // Get histogram from the selected dropdown menu
-    const histname = document.getElementById("meas").value;
-
-    // Check which GENIE is requested
-    const gver = document.getElementById("genie_version").value;
-    // Only draw one GENIE version at a time
-    let gfile;
-    if      (gver == 'G18_02a') gfile = gfile_02a;
-    else if (gver == 'G18_10a') gfile = gfile_10a;
-    else if (gver == 'G18_10b') gfile = gfile_10b;
-
-    // Each generator comes from a different root file; read them all in
-    let data = await gfile.readObject(histname+"_data;1");
-
-    // The generator predictions
-    let gMC = await gfile.readObject(histname+"_MC;1");
-    let nMC = await nfile.readObject(histname+"_MC;1");
-    let nuMC = await nufile.readObject(histname+"_MC;1");
-
-    // Broken down by mode for each generator
-    let gMC_mode = await gfile.readObject(histname+"_MODES;1");
-    let nMC_mode = await nfile.readObject(histname+"_MODES;1");
-    let nuMC_mode = await nufile.readObject(histname+"_MODES;1");
-
-    // Add the shape histograms
-    let gMC_s = await gfile.readObject(histname+"_MC_SHAPE;1");
-    let nMC_s = await nfile.readObject(histname+"_MC_SHAPE;1");
-    let nuMC_s = await nufile.readObject(histname+"_MC_SHAPE;1");
-
-    let gMC_chi2nm1 = await gfile.readObject(histname+"_Chi2NMinusOne;1");
-    let nMC_chi2nm1 = await nfile.readObject(histname+"_Chi2NMinusOne;1");
-    let nuMC_chi2nm1 = await nufile.readObject(histname+"_Chi2NMinusOne;1");
-
-    gMC.fLineColor = 2;
-    nMC.fLineColor = 3;
-    nuMC.fLineColor = 4;
-    gMC_s.fLineColor = gMC.fLineColor;
-    nMC_s.fLineColor = nMC.fLineColor;
-    nuMC_s.fLineColor = nuMC.fLineColor;
-    gMC_chi2nm1.fLineColor = gMC.fLineColor;
-    nMC_chi2nm1.fLineColor = nMC.fLineColor;
-    nuMC_chi2nm1.fLineColor = nuMC.fLineColor;
-    gMC_chi2nm1.fMarkerSize = 1;
-    nMC_chi2nm1.fMarkerSize = 1;
-    nuMC_chi2nm1.fMarkerSize = 1;
-    gMC_chi2nm1.fTitle = "#chi^{2} for N-1 bins";
-
-    // Set the fill color for each
-    const max_stack = Math.max(gMC_mode.fHists.arr.length, nMC_mode.fHists.arr.length, nuMC_mode.fHists.arr.length);
-    let largest = "genie";
-    if (nMC_mode.fHists.arr.length > nuMC_mode.fHists.arr.length && 
-        nMC_mode.fHists.arr.length > gMC_mode.fHists.arr.length) {
-      largest = "neut";
-    } 
-    if (nuMC_mode.fHists.arr.length > nMC_mode.fHists.arr.length && 
-        nuMC_mode.fHists.arr.length > gMC_mode.fHists.arr.length) {
-      largest = "nuwro";
+  <!--  Styles -->
+  <style>
+    /* Control labels */
+    .ctrl-label {
+      font-size: 15pt;
+      margin-right: 10px;
+      cursor: pointer;
+      user-select: none;
     }
 
-    // Build legend of modes
-    leg2.fPrimitives.Clear();
-    for (let i = 0; i < gMC_mode.fHists.arr.length; i++) {
-      gMC_mode.fHists.arr[i].fFillStyle = 0;
-      //gMC_mode.fHists.arr[i].fLineStyle = 7;
-      //gMC_mode.fHists.arr[i].fLineStyle = i+2;
-      gMC_mode.fHists.arr[i].fLineWidth = 1;
-      gMC_mode.fHists.arr[i].fLineColor = gMC.fLineColor;
-    }
-    for (let i = 0; i < nMC_mode.fHists.arr.length; i++) {
-      leg2.fPrimitives.Add(createLegendEntry(nMC_mode.fHists.arr[i], nMC_mode.fHists.arr[i].fTitle, "l"));
-      nMC_mode.fHists.arr[i].fFillStyle = 0;
-      //nMC_mode.fHists.arr[i].fLineStyle = 9;
-      //nMC_mode.fHists.arr[i].fLineStyle = i+2;
-      nMC_mode.fHists.arr[i].fLineWidth = 1;
-      nMC_mode.fHists.arr[i].fLineColor = nMC.fLineColor;
-    }
-    for (let i = 0; i < nuMC_mode.fHists.arr.length; i++) {
-      nuMC_mode.fHists.arr[i].fFillStyle = 0;
-      //nuMC_mode.fHists.arr[i].fLineStyle = 2;
-      //nuMC_mode.fHists.arr[i].fLineStyle = i+2;
-      nuMC_mode.fHists.arr[i].fLineWidth = 1;
-      nuMC_mode.fHists.arr[i].fLineColor = nuMC.fLineColor;
+    .ctrl-select { font-size: 15pt; }
+
+    .gen-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+
+    /* Responsive canvas pads — replaces hard-coded 1024×800px */
+    .jsroot-pad {
+      position: relative;
+      width: 100%;
+      max-width: 1024px;
+      height: min(640px, 80vw);
+      margin-bottom: 8px;
     }
 
-    // Try to clear up different modes
-    // CCQE
-    gMC_mode.fHists.arr[0].fLineStyle = nMC_mode.fHists.arr[0].fLineStyle = nuMC_mode.fHists.arr[0].fLineStyle = 2;
-    // 2p2h
-    gMC_mode.fHists.arr[1].fLineStyle = nMC_mode.fHists.arr[1].fLineStyle = nuMC_mode.fHists.arr[1].fLineStyle = 3;
-    // CC1pi+1p
-    gMC_mode.fHists.arr[2].fLineStyle = nMC_mode.fHists.arr[2].fLineStyle = nuMC_mode.fHists.arr[2].fLineStyle = 9;
-    // CC1pi0
-    gMC_mode.fHists.arr[3].fLineStyle = nMC_mode.fHists.arr[3].fLineStyle = nuMC_mode.fHists.arr[3].fLineStyle = 6;
-    // CC1pi+1n
-    gMC_mode.fHists.arr[4].fLineStyle = nMC_mode.fHists.arr[4].fLineStyle = nuMC_mode.fHists.arr[4].fLineStyle = 4;
-    // Multi-pi
-    gMC_mode.fHists.arr[5].fLineStyle = nMC_mode.fHists.arr[5].fLineStyle = nuMC_mode.fHists.arr[5].fLineStyle = 7;
-    // DIS
-    gMC_mode.fHists.arr[6].fLineStyle = nMC_mode.fHists.arr[6].fLineStyle = nuMC_mode.fHists.arr[6].fLineStyle = 10;
-
-    // Set the maximum on the data
-    let max = Math.max(...data.fArray, ...gMC.fArray, ...nMC.fArray, ...nuMC.fArray);
-    data.fMinimum = 0;
-    data.fMaximum = max*1.1;
-
-    let max2 = Math.max(...gMC_chi2nm1.fArray, ...nMC_chi2nm1.fArray, ...nuMC_chi2nm1.fArray);
-    gMC_chi2nm1.fMinimum = 0;
-    gMC_chi2nm1.fMaximum = max2*1.1;
-
-    data.fName = "Data";
-    gMC.fName = "GENIE";
-    nMC.fName = "NEUT";
-    nuMC.fName = "NuWro";
-    gMC_s.fName = "GENIE shape";
-    nMC_s.fName = "NEUT shape";
-    nuMC_s.fName = "NuWro shape";
-    data.fLineWidth = 2;
-    gMC_s.fLineWidth = 1;
-    nMC_s.fLineWidth = 1;
-    nuMC_s.fLineWidth = 1;
-
-    // Clear the old divs
-    await cleanup("draw_datamc");
-    document.getElementById("draw_datamc").innerHTML = "";
-    await cleanup("draw_chi2nm1");
-    document.getElementById("draw_chi2nm1").innerHTML = "";
-    await cleanup("draw_invcov");
-    document.getElementById("draw_invcov").innerHTML = "";
-
-    // Keep a list of the histograms that are requested to be drawn
-    let histograms = []; 
-    // Always draw the data
-    histograms.push(data);
-
-    // Clean up the data histogram a little bit
-    data.fTitle = histname;
-    data.fXaxis.fLabelFont = 42;
-    data.fXaxis.fLabelSize = 0.03;
-    data.fXaxis.fTitleFont = 42;
-    data.fXaxis.fTitleSize = 0.035;
-    data.fXaxis.fTitleOffset = 1.0;
-    data.fYaxis.fLabelFont = 42;
-    data.fYaxis.fLabelSize = 0.03;
-    data.fYaxis.fTitleFont = 42;
-    data.fYaxis.fTitleSize = 0.035;
-    data.fYaxis.fTitleOffset = 1.0;
-    data.fYaxis.fCenter = false;
-
-    // Clear out the legend
-    leg.fPrimitives.Clear();
-    // Add in the data in the legend with error drawn
-    let title = "Data, N_{bins}="+data.fXaxis.fNbins;
-    leg.fPrimitives.Add(createLegendEntry(data, title, "le"));
-
-    // Number of plots, including data
-    let nplots = 1;
-    const inc_shape = document.getElementById("checkbox_shape");
-    // Go through checkboxes and enable which generators should be drawn
-    const gcheckBox = document.getElementById("checkbox_GENIE");
-    if (gcheckBox.checked == true) {
-      nplots += 1;
-      histograms.push(gMC);
-      const gTitle = gMC.fTitle;
-      leg.fPrimitives.Add(createLegendEntry(gMC, "GENIE, #chi^{2}="+gTitle));
-      if (inc_shape.checked == true) {
-        histograms.push(gMC_s);
-        const gTitle_s = gMC_s.fTitle;
-        leg.fPrimitives.Add(createLegendEntry(gMC_s, "GENIE, norm="+gTitle_s));
-      }
+    .error-banner {
+      background: #fdecea;
+      border: 1px solid #e57373;
+      border-radius: 4px;
+      color: #b71c1c;
+      padding: 8px 14px;
+      margin: 8px 0;
+      font-size: 13px;
     }
-    const ncheckBox = document.getElementById("checkbox_NEUT");
-    if (ncheckBox.checked == true) {
-      nplots += 1;
-      histograms.push(nMC);
-      const nTitle = nMC.fTitle;
-      leg.fPrimitives.Add(createLegendEntry(nMC, "NEUT, #chi^{2}="+nTitle));
-      if (inc_shape.checked == true) {
-        histograms.push(nMC_s);
-        const nTitle_s = nMC_s.fTitle;
-        leg.fPrimitives.Add(createLegendEntry(nMC_s, "NEUT, norm="+nTitle_s));
+  </style>
+
+  <!-- Application script -->
+  <script type="module">
+    // Import from jsroot
+    import { EAxisBits, gStyle, create, openFile, draw, redraw, cleanup }
+      from './jsroot/modules/main.mjs';
+
+    // Constants
+
+    // Line styles assigned to each interaction mode (index = mode position in stack)
+    const MODE_LINE_STYLES = [2, 3, 9, 6, 4, 7, 10];
+
+    // ROOT file paths
+    const FILE_PATHS = {
+      G18_10a: './nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root',
+      G18_10b: './nuiscomp/nuiscomp_genie_g1810b0211a_20200907.root',
+      G18_02a: './nuiscomp/nuiscomp_genie_g1802a0211a_20200907.root',
+      NEUT:    './nuiscomp/nuiscomp_neut_20200907.root',
+      NuWro:   './nuiscomp/nuiscomp_nuwro_20200907.root',
+    };
+
+    // Generator display config: { label, color, checkboxId }
+    const GENERATORS = [
+      { key: 'GENIE', label: 'GENIE',  color: 2, checkboxId: 'checkbox_GENIE' },
+      { key: 'NEUT',  label: 'NEUT',   color: 3, checkboxId: 'checkbox_NEUT'  },
+      { key: 'NuWro', label: 'NuWro',  color: 4, checkboxId: 'checkbox_NuWro' },
+    ];
+
+    // Shared JSROOT objects (created once, reused across overlay() calls)
+    // Will hold the data Nbins, which generators are drawn, and their chi2
+    const leg = makeLegend(0.17, 0.90, 0.90, 0.94, 0.022);
+    // The legend which holds the "by-mode" plots, i.e. CCQE, 2p2h etc
+    const leg2 = makeLegend(0.10, 0.85, 0.88, 0.90, 0.02);
+    leg2.fColumnSeparation = 0;
+    // Contains little NUISANCE reference bottom left
+    const textbox = makeNUISANCEbox();
+
+    // ROOT file handles (opened once at startup)
+    // Map: version-key to opened JSROOT file handle
+    let rootFiles = {};
+
+    // Error display if something goes wrong
+    function showError(msg) {
+      const el = document.getElementById('error-banner');
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    // Safe readObject wrapper
+    // Returns null (and does NOT throw) if the object is missing.
+    async function tryRead(file, key) {
+      if (!file) return null;
+      try {
+        return await file.readObject(key + ';1');
+      } catch {
+        return null;
       }
     }
 
-    const nucheckBox = document.getElementById("checkbox_NuWro");
-    if (nucheckBox.checked == true) {
-      nplots += 1;
-      histograms.push(nuMC);
-      const nuTitle = nuMC.fTitle;
-      leg.fPrimitives.Add(createLegendEntry(nuMC, "NuWro, #chi^{2}="+nuTitle));
-      if (inc_shape.checked == true) {
-        histograms.push(nuMC_s);
-        const nuTitle_s = nuMC_s.fTitle;
-        leg.fPrimitives.Add(createLegendEntry(nuMC_s, "NuWro, norm="+nuTitle_s));
+    // Histogram max over content bins only (excludes under/overflow)
+    function histMax(...hists) {
+      let max = 0;
+      for (const h of hists) {
+        if (!h?.fArray) continue;
+        const nb = h.fXaxis.fNbins;
+        for (let i = 1; i <= nb; i++) {
+          if (h.fArray[i] > max) max = h.fArray[i];
+        }
       }
-    }
-    leg.fNColumns = nplots;
-    data.fFunctions.Clear();
-    data.fFunctions.Add(leg);
-    data.fFunctions.Add(textbox);
-
-    // Loop over the histograms and draw
-    await redraw("draw_datamc", histograms[0]);
-    for (let i = 1; i < histograms.length; i++) {
-      await draw("draw_datamc", histograms[i], "same,hist");
-    }
-    
-    // Draw the histograms by interaction mode
-    const mode_check = document.getElementById("checkbox_modes");
-    if (mode_check.checked == true ) {
-      if (gcheckBox.checked == true) {
-        gMC_mode.fHists.arr[0].fFunctions.Clear();
-        gMC_mode.fHists.arr[0].fFunctions.Add(leg2);
-      }
-      else if (ncheckBox.checked == true) {
-        nMC_mode.fHists.arr[0].fFunctions.Clear();
-        nMC_mode.fHists.arr[0].fFunctions.Add(leg2);
-      }
-      else if (nucheckBox.checked == true) {
-        nuMC_mode.fHists.arr[0].fFunctions.Clear();
-        nuMC_mode.fHists.arr[0].fFunctions.Add(leg2);
-      }
-      if (gcheckBox.checked == true) {
-        await draw("draw_datamc", gMC_mode, "same,hist,nostack");
-      }
-      if (ncheckBox.checked == true) {
-        await draw("draw_datamc", nMC_mode, "same,hist,nostack");
-      }
-      if (nucheckBox.checked == true) {
-        await draw("draw_datamc", nuMC_mode, "same,hist,nostack");
-      }
+      return max;
     }
 
-    // Draw chi2 N-1
-    const inc_nm1 = document.getElementById("checkbox_chi2nm1");
-    gMC_chi2nm1.fFunctions.Add(leg);
-    gMC_chi2nm1.fFunctions.Add(textbox);
-    if (inc_nm1.checked == true) {
-      // Draw nMinus1 chi2
-      await redraw("draw_chi2nm1", gMC_chi2nm1, "hist text1");
-      await draw("draw_chi2nm1", nMC_chi2nm1, "hist text1 same");
-      await draw("draw_chi2nm1", nuMC_chi2nm1, "hist text1 same");
+    // Apply axis style to a histogram
+    function styleAxes(h) {
+      for (const axis of [h.fXaxis, h.fYaxis]) {
+        axis.fLabelFont  = 42;
+        axis.fLabelSize  = 0.03;
+        axis.fTitleFont  = 42;
+        axis.fTitleSize  = 0.035;
+        axis.fTitleOffset = 1.3;
+      }
+      h.fYaxis.fCenter = false;
     }
 
-    // Draw inverse covariance
-    const inc_inv = document.getElementById("checkbox_invcov");
-    if (inc_inv.checked == true) {
-      let data_invcov = await gfile.readObject(histname+"_INVCOV;1");
-      data_invcov.fFunctions.Add(textbox);
-      data_invcov.fTitle = "Inverse covariance matrix";
-      await draw("draw_invcov", data_invcov, "colz");
+    // Create a TLegendEntry
+    function makeLegendEntry(obj, label, opt = 'l') {
+      const entry = create('TLegendEntry');
+      entry.fObject = obj;
+      entry.fLabel  = label;
+      entry.fOption = opt;
+      return entry;
     }
-  }
 
-  // Add listeners to each box
-  document.getElementById("checkbox_GENIE").addEventListener("click", overlay);
-  document.getElementById("checkbox_NEUT").addEventListener("click", overlay);
-  document.getElementById("checkbox_NuWro").addEventListener("click", overlay);
-  document.getElementById("checkbox_shape").addEventListener("click", overlay);
-  document.getElementById("checkbox_chi2nm1").addEventListener("click", overlay);
-  document.getElementById("checkbox_invcov").addEventListener("click", overlay);
-  document.getElementById("checkbox_modes").addEventListener("click", overlay);
-  document.getElementById("genie_version").addEventListener("click", overlay);
-  document.getElementById("meas").addEventListener("click", overlay);
-
-  // Load up the files once
-  const gfilename_10a = "./nuiscomp/nuiscomp_genie_g1810a0211a_20200907.root";
-  const gfilename_10b = "./nuiscomp/nuiscomp_genie_g1810b0211a_20200907.root";
-  const gfilename_02a = "./nuiscomp/nuiscomp_genie_g1802a0211a_20200907.root";
-  const nfilename = "./nuiscomp/nuiscomp_neut_20200907.root";
-  const nufilename = "./nuiscomp/nuiscomp_nuwro_20200907.root";
-
-  const gfile_10a = await openFile(gfilename_10a);
-  const gfile_10b = await openFile(gfilename_10b);
-  const gfile_02a = await openFile(gfilename_02a);
-  const nfile = await openFile(nfilename);
-  const nufile = await openFile(nufilename);
-
-  // Get each 1D measurement in the file
-  let meas_list = [];
-  for (let i = 0; i < nfile.fKeys.length; ++i) {
-    const keyname = nfile.fKeys[i].fName;
-    if (keyname.includes("_data") &&  // Look for data files
-        !keyname.includes("_data_") && // But not shape or ratio data
-        nfile.fKeys[i].fClassName == "TH1D") { // and make sure they're TH1D
-      let name = nfile.fKeys[i].fName;
-      name = name.replace("_data", "");
-      meas_list.push(name);
+    // Create a TLegend
+    function makeLegend(x1, y1, x2, y2, textSize) {
+      const l = create('TLegend');
+      Object.assign(l, { fX1NDC: x1, fY1NDC: y1, fX2NDC: x2, fY2NDC: y2 });
+      l.fColumnSeparation = 0.1;
+      l.fLineWidth  = 0;
+      l.fLineColor  = 0;
+      l.fFillColor  = 0;
+      l.fFillStyle  = 0;
+      l.fTextAlign  = 12;
+      l.fTextSize   = textSize;
+      return l;
     }
-  }
-  // Sort list alphabetically
-  meas_list.sort();
 
-  // Fill the drop-down menu
-  const fill = document.getElementById("meas");
-  // Now make a drop down menu with each of them
-  for (let i = 0; i < meas_list.length; i++) {
-    fill.innerHTML += '<option name="' + meas_list[i] + '">' + meas_list[i] + '</option>';
-  }
+    // Create the NUISANCE credit textbox
+    function makeNUISANCEbox() {
+      const tb = create('TPaveText');
+      Object.assign(tb, { fX1NDC: 0.05, fY1NDC: 0.02, fX2NDC: 0.5, fY2NDC: 0.1 });
+      tb.AddText('NUISANCE [arXiv:1612.07393]');
+      tb.fTextSize  = 0.035;
+      tb.fTextColor = 16;
+      tb.fTextAlign = 11;
+      return tb;
+    }
 
-  // Make a legend
-  let leg = create('TLegend');
-  Object.assign(leg, { fX1NDC: 0.17, fY1NDC: 0.9, fX2NDC: 0.9, fY2NDC: 0.94 });
-  leg.fColumnSeparation = 0.1;
-  leg.fLineWidth = 0;
-  leg.fLineColor = 0;
-  leg.fFillColor = 0;
-  leg.fFillStyle = 0;
-  leg.fTextAlign = 12;
-  leg.fTextSize = 0.022;
+    // Clear a JSROOT TList safely
+    function clearList(list) {
+      if (!list) return;
+      list.arr = [];
+      list.opt = [];
+    }
 
-  // Make a legend for the by-mode
-  let leg2 = create('TLegend');
-  Object.assign(leg2, { fX1NDC: 0.17, fY1NDC: 0.1, fX2NDC: 0.45, fY2NDC: 0.3 });
-  leg2.fColumnSeparation = 0.1;
-  leg2.fLineWidth = 0;
-  leg2.fLineColor = 0;
-  leg2.fFillColor = 0;
-  leg2.fFillStyle = 0;
-  leg2.fTextAlign = 12;
-  leg2.fTextSize = 0.022;
+    // Apply style to a single MC histogram
+    function styleMC(h, color, genname, lineWidth = 2) {
+      h.fLineColor = color;
+      h.fLineWidth = lineWidth;
+      h.fName = genname;
+    }
 
-  // Insert a NUISANCE logo
-  let textbox = create('TPaveText');
-  Object.assign(textbox, { fX1NDC: 0.05, fY1NDC: 0.03, fX2NDC: 0.5, fY2NDC: 0.1 });
-  textbox.AddText("NUISANCE [arXiv:1612.07393]");
-  textbox.fTextSize = 0.035;
-  textbox.fTextColor = 18;
-  textbox.fTextAlign = 11;
+    // Apply style to a shape histogram
+    function styleShape(h, color, genname) {
+      h.fLineColor = color;
+      h.fLineWidth = 1;
+      h.fName = genname + ' shape norm.';
+    }
 
-  // Remove the stat box
-  gStyle.fOptStat = 0;
-  // Force not center title
-  EAxisBits.kCenterTitle = false;
+    // Apply style to a chi2 N-1 histogram
+    function styleChi2(h, color, title) {
+      h.fLineColor  = color;
+      h.fMarkerSize = 1;
+      if (title) h.fTitle = title;
+    }
 
-  // Do the first overlay
-  await overlay();
-</script>
+    // Apply mode line styles to a THStack's histograms
+    function styleModeStack(stack, color) {
+      if (!stack?.fHists?.arr) return;
+      stack.fHists.arr.forEach((h, i) => {
+        h.fFillStyle  = 0;
+        h.fLineWidth  = 1;
+        h.fLineColor  = color;
+        h.fLineStyle  = MODE_LINE_STYLES[i] ?? 1;
+      });
+    }
+
+    // Get the active GENIE file based on the version dropdown
+    function getGenieFile() {
+      const ver = document.getElementById('genie_version').value;
+      return rootFiles[ver] ?? null;
+    }
+
+    // Read all objects for one generator from its ROOT file
+    // Returns an object with all histogram handles (null if missing).
+    async function readGeneratorObjects(file, histname) {
+      const [mc, shape, modes, chi2nm1] = await Promise.all([
+        tryRead(file, `${histname}_MC`),
+        tryRead(file, `${histname}_MC_SHAPE`),
+        tryRead(file, `${histname}_MODES`),
+        tryRead(file, `${histname}_Chi2NMinusOne`),
+      ]);
+      return { mc, shape, modes, chi2nm1 };
+    }
+
+    // Clean and reset a draw div
+    async function resetDiv(id) {
+      await cleanup(id);
+      document.getElementById(id).innerHTML = '';
+    }
+
+    // Main overlay function
+    async function overlay() {
+      showError('');
+      const histname  = document.getElementById('meas').value;
+      if (!histname) return;
+
+      const genieFile = getGenieFile();
+      const showShape = document.getElementById('checkbox_shape').checked;
+      const showModes = document.getElementById('checkbox_modes').checked;
+      const showNm1   = document.getElementById('checkbox_chi2nm1').checked;
+      const showInvCov = document.getElementById('checkbox_invcov').checked;
+
+      // Read data histogram (from GENIE file; data is generator-independent)
+      const data = await tryRead(genieFile, `${histname}_data`);
+      if (!data) {
+        showError(`Could not read data histogram for "${histname}". Check the measurement name and that the file loaded correctly.`);
+        return;
+      }
+
+      // Read all generator objects in parallel
+      const [genieObjs, neutObjs, nuwroObjs] = await Promise.all([
+        readGeneratorObjects(genieFile,        histname),
+        readGeneratorObjects(rootFiles.NEUT,   histname),
+        readGeneratorObjects(rootFiles.NuWro,  histname),
+      ]);
+
+      // Map generator key to its objects, for uniform processing below
+      const genObjs = {
+        GENIE: genieObjs,
+        NEUT:  neutObjs,
+        NuWro: nuwroObjs,
+      };
+
+      // Apply styles
+      for (const { key, label, color } of GENERATORS) {
+        const o = genObjs[key];
+        if (o.mc)      styleMC(o.mc, color, label);
+        if (o.shape)   styleShape(o.shape, color, label);
+        if (o.chi2nm1) styleChi2(o.chi2nm1, color, '#chi^{2} for N-1 bins');
+        if (o.modes)   styleModeStack(o.modes, color);
+      }
+
+      // Set Y range (content bins only, no under/overflow)
+      const allMC = GENERATORS.map(g => genObjs[g.key].mc).filter(Boolean);
+      const yMax  = histMax(data, ...allMC) * 1.1;
+      data.fMinimum = 0;
+      data.fMaximum = yMax;
+
+      // Prepare data histogram 
+      data.fTitle     = histname;
+      // Replace the title
+      data.fName      = 'Data';
+      data.fLineWidth = 2;
+      styleAxes(data);
+
+      // Build main legend
+      clearList(leg.fPrimitives);
+
+      const dataNbins = data.fXaxis.fNbins;
+      leg.fPrimitives.arr.push(makeLegendEntry(data, `Data, N_{bins}=${dataNbins}`, 'le'));
+      leg.fPrimitives.opt.push('');
+
+      // Build mode legend and histograms list
+      clearList(leg2.fPrimitives);
+
+      // Collect mode legend entries from the first active generator that has modes
+      const firstActiveModeGen = GENERATORS.find(g =>
+        document.getElementById(g.checkboxId).checked && genObjs[g.key].modes
+      );
+
+      if (firstActiveModeGen) {
+        genObjs[firstActiveModeGen.key].modes.fHists.arr.forEach(h => {
+          leg2.fPrimitives.arr.push(makeLegendEntry(h, h.fTitle, 'l'));
+          leg2.fPrimitives.opt.push('');
+        });
+        leg2.fNColumns = leg2.fPrimitives.arr.length;
+      }
+
+      // Collect histograms to draw in the main pad
+      // Always start with data
+      const toDraw = [{ h: data, opt: '' }];
+
+      // Attach legend and textbox to data (clear first to avoid accumulation)
+      clearList(data.fFunctions);
+      data.fFunctions.arr.push(leg, textbox);
+      data.fFunctions.opt.push('', '');
+
+      let nActivePlots = 1; // data always shown
+      for (const { key, label, color, checkboxId } of GENERATORS) {
+        if (!document.getElementById(checkboxId).checked) continue;
+        const o = genObjs[key];
+
+        if (o.mc) {
+          const chi2Label = o.mc.fTitle; // nuiscomp stores chi2 in fTitle
+          leg.fPrimitives.arr.push(makeLegendEntry(o.mc, `${label}, #chi^{2}=${chi2Label}`));
+          leg.fPrimitives.opt.push('');
+          toDraw.push({ h: o.mc, opt: 'same,hist' });
+          nActivePlots++;
+        }
+
+        if (showShape && o.shape) {
+          const shapeLabel = o.shape.fTitle;
+          leg.fPrimitives.arr.push(makeLegendEntry(o.shape, `${label}, norm=${shapeLabel}`));
+          leg.fPrimitives.opt.push('');
+          toDraw.push({ h: o.shape, opt: 'same,hist' });
+        }
+      }
+
+      leg.fNColumns = nActivePlots;
+
+      // Reset draw divs
+      await Promise.all([
+        resetDiv('draw_datamc'),
+        resetDiv('draw_chi2nm1'),
+        resetDiv('draw_invcov'),
+      ]);
+
+      // Draw main pad
+      await redraw('draw_datamc', toDraw[0].h);
+      for (let i = 1; i < toDraw.length; i++) {
+        await draw('draw_datamc', toDraw[i].h, toDraw[i].opt);
+      }
+
+      // Draw mode stacks
+      if (showModes) {
+        // Attach mode legend to the first histogram in the first active mode stack
+        const firstModeGen = GENERATORS.find(g =>
+          document.getElementById(g.checkboxId).checked && genObjs[g.key].modes?.fHists?.arr?.length
+        );
+        if (firstModeGen) {
+          const firstStack = genObjs[firstModeGen.key].modes;
+          clearList(firstStack.fHists.arr[0].fFunctions);
+          firstStack.fHists.arr[0].fFunctions.arr.push(leg2);
+          firstStack.fHists.arr[0].fFunctions.opt.push('');
+        }
+
+        for (const { key, checkboxId } of GENERATORS) {
+          if (!document.getElementById(checkboxId).checked) continue;
+          const stack = genObjs[key].modes;
+          if (stack) await draw('draw_datamc', stack, 'same,hist,nostack');
+        }
+      }
+
+      // Draw chi2 N-1 pad
+      if (showNm1) {
+        // Find the first active generator with a chi2nm1 histogram to use as the frame
+        const firstChi2Gen = GENERATORS.find(g =>
+          document.getElementById(g.checkboxId).checked && genObjs[g.key].chi2nm1
+        );
+        if (firstChi2Gen) {
+          const firstChi2 = genObjs[firstChi2Gen.key].chi2nm1;
+
+          // Set Y range for chi2 pad
+          const allChi2 = GENERATORS.map(g => genObjs[g.key].chi2nm1).filter(Boolean);
+          const chi2Max = histMax(...allChi2) * 1.1;
+          firstChi2.fMinimum = 0;
+          firstChi2.fMaximum = chi2Max;
+          styleAxes(firstChi2);
+
+          // Attach legend and textbox to the frame histogram
+          clearList(firstChi2.fFunctions);
+          firstChi2.fFunctions.arr.push(leg, textbox);
+          firstChi2.fFunctions.opt.push('', '');
+
+          await redraw('draw_chi2nm1', firstChi2, 'hist');
+
+          // Draw remaining generators
+          for (const { key, checkboxId } of GENERATORS) {
+            if (key === firstChi2Gen.key) continue;
+            if (!document.getElementById(checkboxId).checked) continue;
+            const h = genObjs[key].chi2nm1;
+            if (h) await draw('draw_chi2nm1', h, 'hist same');
+          }
+        }
+      }
+
+      // Draw inverse covariance
+      if (showInvCov) {
+        const invcov = await tryRead(genieFile, `${histname}_INVCOV`);
+        if (invcov) {
+          clearList(invcov.fFunctions);
+          invcov.fFunctions.arr.push(textbox);
+          invcov.fFunctions.opt.push('');
+          invcov.fTitle = 'Inverse covariance matrix';
+          styleAxes(invcov);
+          await draw('draw_invcov', invcov, 'colz');
+        }
+      }
+    }
+
+    // Populate measurement dropdown
+    // Builds the union of measurements across ALL generator files so that
+    // no measurement is silently omitted because it is absent from one file.
+    function populateMeasurements(files) {
+      const seen = new Set();
+      for (const file of files) {
+        if (!file?.fKeys) continue;
+        for (const key of file.fKeys) {
+          if (
+            key.fClassName === 'TH1D' &&
+            key.fName.endsWith('_data') &&
+            !key.fName.includes('_data_')
+          ) {
+            seen.add(key.fName.replace('_data', ''));
+          }
+        }
+      }
+
+      const sorted = Array.from(seen).sort();
+      const select = document.getElementById('meas');
+      select.innerHTML = '';
+      for (const name of sorted) {
+        const opt = document.createElement('option');
+        opt.value       = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      }
+    }
+
+    // Attach event listeners
+    function attachListeners() {
+      const ids = [
+        'checkbox_GENIE', 'checkbox_NEUT', 'checkbox_NuWro',
+        'checkbox_shape', 'checkbox_chi2nm1', 'checkbox_invcov', 'checkbox_modes',
+        'meas',
+      ];
+      for (const id of ids) {
+        document.getElementById(id).addEventListener('change', overlay);
+      }
+      // genie_version is a <select> — use 'change', not 'click'
+      document.getElementById('genie_version').addEventListener('change', overlay);
+    }
+
+    // Startup
+    async function init() {
+      gStyle.fOptStat       = 0;
+      EAxisBits.kCenterTitle = false;
+
+      // Open all ROOT files in parallel
+      const [g10a, g10b, g02a, neut, nuwro] = await Promise.all(
+        Object.values(FILE_PATHS).map(path =>
+          openFile(path).catch(err => {
+            console.error(`Failed to open ${path}:`, err);
+            return null;
+          })
+        )
+      );
+
+      rootFiles = {
+        G18_10a: g10a,
+        G18_10b: g10b,
+        G18_02a: g02a,
+        NEUT:    neut,
+        NuWro:   nuwro,
+      };
+
+      // Warn if any file failed to load
+      const failed = Object.entries(FILE_PATHS)
+        .filter((_, i) => [g10a, g10b, g02a, neut, nuwro][i] === null)
+        .map(([k]) => k);
+      if (failed.length) {
+        showError(`Warning: could not load files for: ${failed.join(', ')}. Some generators will be unavailable.`);
+      }
+
+      // Build measurement list from the union of all files
+      populateMeasurements([g10a, g10b, g02a, neut, nuwro]);
+
+      attachListeners();
+      await overlay();
+    }
+
+    init();
+  </script>
 </body>
 </html>
