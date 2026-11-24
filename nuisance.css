@@ -81,6 +81,14 @@ hr.vis {
   height: 2px;
 }
 
+h2 {
+  line-height: 24px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #996;
+  color: #000 !important;
+}
+
 hr {
   display: block;
   color: black;
@@ -154,8 +162,8 @@ green, blue, red, dblue {
 /* Needs to be included in sidebar or similar */
 /* Otherwise gets over-ridden by hepforge-override.css */
 /*  background: #eec;
-    border: #cca 3px solid;
-  */
+border: #cca 3px solid;
+ */
 #hepforge-sidebarbox {
   white-space: nowrap;
   background: #ffedd1;
@@ -446,24 +454,24 @@ green, blue, red, dblue {
 .b9 { background-color: #FFFFFF; }
 .f9 > .bold,.bold > .f9, body.f9 > pre > .bold {
   /* Bold is heavy black on white, or bright white
-     depending on the default background */
-  color: #000000;
-  font-weight: bold;
+  depending on the default background */
+color: #000000;
+font-weight: bold;
 }
 .reverse {
   /* CSS does not support swapping fg and bg colours unfortunately,
-     so just hardcode something that will look OK on all backgrounds. */
-  color: #000000; background-color: #AAAAAA;
+  so just hardcode something that will look OK on all backgrounds. */
+color: #000000; background-color: #AAAAAA;
 }
 .underline { text-decoration: underline; }
 .line-through { text-decoration: line-through; }
 .blink { text-decoration: blink; }
 
 /* Avoid pixels between adjacent span elements.
-   Note this only works for lines less than 80 chars
-   where we close span elements on the same line.
+Note this only works for lines less than 80 chars
+where we close span elements on the same line.
 span { display: inline-block; }
-*/
+ */
 </style>
 
 /* Over-ride the hepforge default header */
@@ -471,10 +479,10 @@ span { display: inline-block; }
 /* Otherwise gets over-ridden by hepforge-override.css */
 /*
 #hf_header {
-  background-color: white;
-  color:white;
-  border:0px;
-  font-size:0px;
-  padding:0px;
+background-color: white;
+color:white;
+border:0px;
+font-size:0px;
+padding:0px;
 }
-*/
+ */
